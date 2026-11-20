@@ -1,12 +1,15 @@
 ---
+# CATL投屏 专用 CI：只构建 macOS 与 Windows 两个平台，打 tag（v*）时自动发布 Release。
 name: CI
 permissions: {}
 
 on:
-  pull_request:
   push:
     branches:
       - master
+    tags:
+      - 'v*'
+  pull_request:
   workflow_dispatch:
 
 concurrency:
@@ -14,97 +17,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  organization:
-    uses: LizardByte/.github/.github/workflows/__call-organization.yml@master
-
-  github-env:
-    name: GitHub Env Debug
+  meta:
+    name: Build metadata
     permissions:
       contents: read
-    uses: LizardByte/.github/.github/workflows/__call-github-env.yml@master
-
-  release-setup:
-    needs: organization
-    name: Release Setup
-    outputs:
-      publish_release: >-
-        ${{ needs.organization.outputs.allowed == 'true' &&
-        steps.release-setup.outputs.publish_release == 'true' }}
-      release_body: ${{ steps.release-setup.outputs.release_body }}
-      release_commit: ${{ steps.release-setup.outputs.release_commit }}
-      release_generate_release_notes: ${{ steps.release-setup.outputs.release_generate_release_notes }}
-      release_tag: ${{ steps.release-setup.outputs.release_tag }}
-      release_version: ${{ steps.release-setup.outputs.release_version }}
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-
-      - name: Release Setup
-        id: release-setup
-        uses: LizardByte/actions/actions/release_setup@5cffab388578559f85fa83c6f7bfff244e06600d  # v2026.1108.210022
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-  build-docker:
-    name: Docker
-    needs: release-setup
-    permissions:
-      contents: read
-      packages: write
-    uses: LizardByte/.github/.github/workflows/__call-docker.yml@master
-    with:
-      docker_hub_username: ${{ vars.DOCKER_HUB_USERNAME }}
-      gh_bot_name: ${{ vars.GH_BOT_NAME }}
-      maximize_build_space: true
-      publish_release: ${{ needs.release-setup.outputs.publish_release }}
-      release_commit: ${{ needs.release-setup.outputs.release_commit }}
-      release_tag: ${{ needs.release-setup.outputs.release_tag }}
-      release_version: ${{ needs.release-setup.outputs.release_version }}
-    secrets:
-      DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
-      DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      GH_BOT_TOKEN: ${{ secrets.GH_BOT_TOKEN }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-freebsd:
-    name: FreeBSD
-    needs: release-setup
-    permissions:
-      contents: read
-    uses: ./.github/workflows/ci-freebsd.yml
-    with:
-      release_commit: ${{ needs.release-setup.outputs.release_commit }}
-      release_version: ${{ needs.release-setup.outputs.release_version }}
-
-  build-homebrew:
-    name: Homebrew
-    needs: release-setup
-    permissions:
-      contents: read
-    uses: ./.github/workflows/ci-homebrew.yml
-    with:
-      git_username: ${{ vars.GH_BOT_NAME }}
-      publish_release: ${{ needs.release-setup.outputs.publish_release }}
-      release_commit: ${{ needs.release-setup.outputs.release_commit }}
-      release_tag: ${{ needs.release-setup.outputs.release_tag }}
-      release_version: ${{ needs.release-setup.outputs.release_version }}
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_BOT_TOKEN }}
-      GIT_EMAIL: ${{ secrets.GH_BOT_EMAIL }}
+      - name: Resolve version
+        id: version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "version=${GITHUB_REF_NAME}" >> "${GITHUB_OUTPUT}"
+          else
+            echo "version=0.0.0-$(date -u +%Y%m%d)-${GITHUB_SHA::7}" >> "${GITHUB_OUTPUT}"
+          fi
 
   build-macos:
     name: macOS
-    needs: release-setup
+    needs: meta
     permissions:
       contents: read
     uses: ./.github/workflows/ci-macos.yml
     with:
-      publish_release: ${{ needs.release-setup.outputs.publish_release }}
-      release_commit: ${{ needs.release-setup.outputs.release_commit }}
-      release_version: ${{ needs.release-setup.outputs.release_version }}
+      publish_release: 'false'
+      release_commit: ${{ github.sha }}
+      release_version: ${{ needs.meta.outputs.version }}
     secrets:
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -115,205 +54,30 @@ jobs:
       APPLE_DEVELOPER_ID_APPLICATION_CERTIFICATE_P12_PASSWORD: >-
         ${{ secrets.APPLE_DEVELOPER_ID_APPLICATION_CERTIFICATE_P12_PASSWORD }}
 
-  build-linux:
-    name: Linux
-    needs: release-setup
-    permissions:
-      contents: read
-    uses: ./.github/workflows/ci-linux.yml
-    with:
-      release_commit: ${{ needs.release-setup.outputs.release_commit }}
-      release_version: ${{ needs.release-setup.outputs.release_version }}
-
-  build-archlinux:
-    name: Archlinux
-    needs: release-setup
-    permissions:
-      contents: read
-    uses: ./.github/workflows/ci-archlinux.yml
-    with:
-      release_commit: ${{ needs.release-setup.outputs.release_commit }}
-      release_version: ${{ needs.release-setup.outputs.release_version }}
-
-  build-alpine:
-    name: Alpine
-    needs: release-setup
-    permissions:
-      contents: read
-    uses: ./.github/workflows/ci-alpine.yml
-    with:
-      release_commit: ${{ needs.release-setup.outputs.release_commit }}
-      release_version: ${{ needs.release-setup.outputs.release_version }}
-
-  build-linux-copr:
-    name: Linux Copr
-    if: github.event_name != 'push'  # releases are handled directly in ci-release.yml
-    needs: release-setup
-    permissions:
-      contents: write  # needed to update releases
-    uses: ./.github/workflows/ci-copr.yml
-    secrets:
-      COPR_BETA_WEBHOOK_TOKEN: ${{ secrets.COPR_BETA_WEBHOOK_TOKEN }}
-      COPR_STABLE_WEBHOOK_TOKEN: ${{ secrets.COPR_STABLE_WEBHOOK_TOKEN }}
-      COPR_CLI_CONFIG: ${{ secrets.COPR_CLI_CONFIG }}
-      VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
-
-  build-linux-flatpak:
-    name: Linux Flatpak
-    needs: release-setup
-    permissions:
-      contents: read
-    uses: ./.github/workflows/ci-flatpak.yml
-    with:
-      release_commit: ${{ needs.release-setup.outputs.release_commit }}
-      release_version: ${{ needs.release-setup.outputs.release_version }}
-
   build-windows:
     name: Windows
-    needs: release-setup
+    needs: meta
     permissions:
       contents: read
     uses: ./.github/workflows/ci-windows.yml
     with:
-      azure_signing_account: ${{ vars.AZURE_SIGNING_ACCOUNT }}
-      azure_signing_cert_profile: ${{ vars.AZURE_SIGNING_CERT_PROFILE }}
-      azure_signing_endpoint: ${{ vars.AZURE_SIGNING_ENDPOINT }}
-      publish_release: ${{ needs.release-setup.outputs.publish_release }}
-      release_commit: ${{ needs.release-setup.outputs.release_commit }}
-      release_version: ${{ needs.release-setup.outputs.release_version }}
+      publish_release: 'false'
+      release_commit: ${{ github.sha }}
+      release_version: ${{ needs.meta.outputs.version }}
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
-  test-powershell:
-    name: PowerShell
-    permissions:
-      contents: read
-    uses: ./.github/workflows/ci-powershell.yml
-
-  web-ui:
-    name: Web UI
-    needs: release-setup
-    permissions:
-      contents: read
-    uses: ./.github/workflows/ci-web.yml
-    with:
-      release_version: ${{ needs.release-setup.outputs.release_version }}
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  coverage:
-    name: Coverage-${{ matrix.name }}
-    if: >-
-      always() &&
-      !cancelled() &&
-      needs.organization.outputs.allowed == 'true'
-    needs:
-      - organization
-      - build-freebsd
-      - build-linux
-      - build-archlinux
-      - build-alpine
-      - build-linux-flatpak
-      - build-macos
-      - build-homebrew
-      - build-windows
-      - test-powershell
-      - web-ui
-    permissions:
-      contents: read
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: FreeBSD-amd64
-            coverage: true
-          - name: Linux-AppImage-aarch64
-            coverage: true
-          - name: Linux-AppImage-x86_64
-            coverage: true
-          - name: Archlinux
-            coverage: true
-          - name: Alpine-x86_64
-            coverage: true
-          - name: Alpine-aarch64
-            coverage: true
-          - name: macOS-arm64
-            coverage: true
-          - name: macOS-x86_64
-            coverage: true
-          - name: Homebrew-macos-15
-            coverage: true
-            coverage_file: coverage.lcov
-          - name: Homebrew-macos-26
-            coverage: true
-            coverage_file: coverage.lcov
-          - name: Homebrew-ubuntu-24.04
-            coverage: true
-          - name: Windows-AMD64
-            coverage: true
-          - name: Windows-ARM64
-            coverage: true
-          - name: PowerShell
-            coverage: true
-          - name: Web-UI
-            coverage: true
-            coverage_file: coverage/coverage-final.json
-            test_results_file: junit.xml
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-
-      - name: Download coverage artifact
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
-        with:
-          name: coverage-${{ matrix.name }}
-          path: _coverage
-
-      - name: Upload test coverage
-        if: matrix.coverage != false
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5  # v7.1.1
-        with:
-          disable_search: true
-          fail_ci_if_error: true
-          files: ./_coverage/${{ matrix.coverage_file || 'coverage.xml' }}
-          report_type: coverage
-          flags: ${{ matrix.name }}
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
-
-      - name: Upload test results
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5  # v7.1.1
-        with:
-          disable_search: true
-          fail_ci_if_error: true
-          files: ./_coverage/${{ matrix.test_results_file || 'tests/test_results.xml' }}
-          report_type: test_results
-          flags: ${{ matrix.name }}
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
-
   release:
     name: Release
-    if:
-      needs.release-setup.outputs.publish_release == 'true' &&
-      needs.organization.outputs.allowed == 'true'
+    if: startsWith(github.ref, 'refs/tags/v')
     needs:
-      - organization
-      - release-setup
-      - build-archlinux
-      - build-alpine
-      - build-docker
-      - build-freebsd
-      - build-homebrew
-      - build-linux
-      - build-linux-flatpak
+      - meta
       - build-macos
       - build-windows
     permissions:
-      contents: read
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Download build artifacts
@@ -323,48 +87,44 @@ jobs:
           pattern: build-*
           merge-multiple: true
 
-      - name: Debug artifacts
-        run: ls -l artifacts
+      - name: List artifacts
+        run: ls -lh artifacts
 
-      - name: Create/Update GitHub Release
-        uses: LizardByte/actions/actions/release_create@5cffab388578559f85fa83c6f7bfff244e06600d  # v2026.1108.210022
-        with:
-          allowUpdates: false
-          body: ${{ needs.release-setup.outputs.release_body }}
-          generateReleaseNotes: ${{ needs.release-setup.outputs.release_generate_release_notes }}
-          name: ${{ needs.release-setup.outputs.release_tag }}
-          prerelease: true
-          tag: ${{ needs.release-setup.outputs.release_tag }}
-          token: ${{ secrets.GH_BOT_TOKEN }}
-          virustotal_api_key: ${{ secrets.VIRUSTOTAL_API_KEY }}
+      - name: Write release notes
+        run: |
+          cat > release-notes.md <<'EOF'
+          CATL投屏 电脑端（Sunshine 定制版）
 
-  release-homebrew-beta:
-    name: Release Homebrew Beta
-    if:
-      needs.release-setup.outputs.publish_release == 'true' &&
-      needs.organization.outputs.allowed == 'true'
-    needs:
-      - organization
-      - release-setup
-      - build-homebrew
-      - release
-    permissions:
-      contents: read
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download homebrew artifacts
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
-        with:
-          name: beta-Homebrew
-          path: homebrew
+          ## 下载
 
-      - name: Upload Homebrew Beta Formula
-        uses: LizardByte/actions/actions/release_homebrew@master  # action requires too many updates to pin
-        with:
-          actionlint_config: "---\n# empty config"
-          formula_file: ${{ github.workspace }}/homebrew/sunshine-beta.rb
-          git_email: ${{ secrets.GH_BOT_EMAIL }}
-          git_username: ${{ vars.GH_BOT_NAME }}
-          publish: true
-          token: ${{ secrets.GH_BOT_TOKEN }}
-          validate: false
+          | 文件 | 适用 |
+          | --- | --- |
+          | `Sunshine-macOS-arm64.dmg` | Apple 芯片 Mac（M 系列） |
+          | `Sunshine-macOS-x86_64.dmg` | Intel Mac |
+          | `Sunshine-Windows-AMD64-installer.msi` | Windows x64 安装包 |
+          | `Sunshine-Windows-AMD64-lite.zip` | Windows x64 免安装版 |
+          | `Sunshine-Windows-ARM64-installer.msi` / `-lite.zip` | Windows ARM64 |
+
+          ## 安装后
+
+          1. 启动 CATL投屏，首次运行按提示授予「屏幕录制」「辅助功能」「本地网络」权限。
+          2. 电视端打开 CATL投屏 App，会自动发现这台电脑。
+          3. 点电脑卡片即可直接投屏，无需再选应用。
+
+          ## 说明
+
+          - macOS 包未做 Apple 公证，首次打开需右键 →「打开」，或执行 `xattr -cr /Applications/Sunshine.app`。
+          - Web 管理界面：`https://localhost:47990`
+          EOF
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "${TAG}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "CATL投屏 ${TAG}" \
+            --notes-file release-notes.md \
+            --verify-tag \
+            artifacts/*
