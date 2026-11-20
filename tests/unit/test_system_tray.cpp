@@ -380,9 +380,9 @@ TEST_F(SystemTrayTest, PreparesLicensedVirtualHidMenuBeforeInitialization) {
   const auto *license_menu = tray_data.menu[2].submenu;
   ASSERT_NE(license_menu, nullptr);
   EXPECT_STREQ(license_menu[0].text, "状态：已授权");
-  EXPECT_STREQ(license_menu[1].text, "Plan: Yearly");
-  EXPECT_STREQ(license_menu[2].text, "Customer: customer@example.com");
-  EXPECT_STREQ(license_menu[3].text, "Machine activation limit: 5");
+  EXPECT_STREQ(license_menu[1].text, "套餐：Yearly");
+  EXPECT_STREQ(license_menu[2].text, "客户：customer@example.com");
+  EXPECT_STREQ(license_menu[3].text, "激活设备上限：5");
   EXPECT_STREQ(license_menu[4].text, "-");
   EXPECT_STREQ(license_menu[5].text, "获取/管理许可证");
   EXPECT_NE(license_menu[5].cb, nullptr);
@@ -397,9 +397,9 @@ TEST_F(SystemTrayTest, PreparesLicensedVirtualHidMenuBeforeInitialization) {
   license.activation_limit = 0;
   system_tray::update_tray_virtualhid_license(license, false);
 
-  EXPECT_STREQ(license_menu[1].text, "This machine is activated");
-  EXPECT_STREQ(license_menu[2].text, "Customer: Not reported");
-  EXPECT_STREQ(license_menu[3].text, "Machine activation limit: Not reported");
+  EXPECT_STREQ(license_menu[1].text, "本机已激活");
+  EXPECT_STREQ(license_menu[2].text, "客户：未上报");
+  EXPECT_STREQ(license_menu[3].text, "激活设备上限：未上报");
 }
 
 TEST_F(SystemTrayTest, PromptsForUnsetGamepadDriverEvenWhenLicensed) {
@@ -544,7 +544,7 @@ INSTANTIATE_TEST_SUITE_P(
   LicenseStates,
   UnlicensedVirtualHidTrayTest,
   testing::Values(
-    std::tuple {lvh::LicenseState::unavailable, "Unavailable", "The local license service is unavailable", false},
+    std::tuple {lvh::LicenseState::unavailable, "不可用", "本地许可证服务不可用", false},
     std::tuple {lvh::LicenseState::unlicensed, "未激活", "本机没有启用中的许可证", true},
     std::tuple {lvh::LicenseState::expired, "已过期", "本机许可证已过期", true},
     std::tuple {lvh::LicenseState::disabled, "已停用", "本机许可证已停用", true},
