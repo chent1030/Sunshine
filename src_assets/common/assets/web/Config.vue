@@ -90,13 +90,6 @@
         :platform="platform">
       </general>
 
-      <!-- Input Tab -->
-      <inputs
-        v-if="currentTab === 'input'"
-        :config="config"
-        :platform="platform">
-      </inputs>
-
       <!-- Audio/Video Tab -->
       <audio-video
         v-if="currentTab === 'av'"
@@ -144,7 +137,6 @@
   import { apiFetch } from './fetch_utils'
   import configTabs from './configs/config_tabs.json'
   import General from './configs/tabs/General.vue'
-  import Inputs from './configs/tabs/Inputs.vue'
   import Network from './configs/tabs/Network.vue'
   import Files from './configs/tabs/Files.vue'
   import Advanced from './configs/tabs/Advanced.vue'
@@ -154,7 +146,6 @@
     Check,
     Cpu,
     FileCog,
-    Gamepad2,
     Gpu,
     Network as NetworkIcon,
     Save,
@@ -195,7 +186,6 @@
     components: {
       Navbar,
       General,
-      Inputs,
       Network,
       Files,
       Advanced,
@@ -206,7 +196,6 @@
       Cpu,
       Check,
       FileCog,
-      Gamepad2,
       Gpu,
       NetworkIcon,
       Save,
@@ -315,7 +304,6 @@
       getTabIcon(tabId) {
         const iconMap = {
           'general': 'Settings',
-          'input': 'Gamepad2',
           'av': 'Volume2',
           'network': 'NetworkIcon',
           'files': 'FileCog',

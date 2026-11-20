@@ -151,10 +151,10 @@ namespace system_tray {
      */
     std::array<struct tray_menu, 5> &virtualhid_benefits_menu_storage() {
       static std::array<struct tray_menu, 5> benefits_menu {{
-        {.text = "Xbox One, Xbox Series, DualSense (DS5), Switch Pro, and Generic", .disabled = 1},
-        {.text = "Raw Input keyboard and mouse for physical-style input", .disabled = 1},
-        {.text = "Motion, touchpads, LEDs, and adaptive triggers where supported", .disabled = 1},
-        {.text = "Actively developed and supported by LizardByte", .disabled = 1},
+        {.text = "Xbox One/Xbox Series/DualSense (DS5)/Switch Pro 及通用手柄", .disabled = 1},
+        {.text = "物理手柄风格的键盘鼠标 Raw Input", .disabled = 1},
+        {.text = "支持的体感/触摸板/LED/自适应扳机", .disabled = 1},
+        {.text = "由 LizardByte 持续开发维护", .disabled = 1},
         {},
       }};
       return benefits_menu;
@@ -170,18 +170,6 @@ namespace system_tray {
   void tray_open_ui_cb([[maybe_unused]] struct tray_menu *item) {
     BOOST_LOG(info) << "Opening UI from system tray"sv;
     launch_ui();
-  }
-
-  void tray_donate_github_cb([[maybe_unused]] struct tray_menu *item) {
-    platf::open_url("https://github.com/sponsors/LizardByte");
-  }
-
-  void tray_donate_patreon_cb([[maybe_unused]] struct tray_menu *item) {
-    platf::open_url("https://www.patreon.com/LizardByte");
-  }
-
-  void tray_donate_paypal_cb([[maybe_unused]] struct tray_menu *item) {
-    platf::open_url("https://www.paypal.com/paypalme/ReenigneArcher");
   }
 
   #if defined(_WIN32) || defined(__APPLE__)
@@ -260,14 +248,14 @@ namespace system_tray {
    */
   std::array<struct tray_menu, 9> initial_virtualhid_license_menu() {
     std::array<struct tray_menu, 9> menu {};
-    menu[0] = {.text = "Status: Checking", .disabled = 1};
+    menu[0] = {.text = "状态：检查中", .disabled = 1};
     menu[1] = {.text = "-"};
-    menu[2] = {.text = "Get/Manage License", .cb = tray_virtualhid_license_cb};
+    menu[2] = {.text = "获取/管理许可证", .cb = tray_virtualhid_license_cb};
     #ifdef _WIN32
-    menu[3] = {.text = "Virtual HID Broker Benefits", .submenu = virtualhid_benefits_menu_storage().data()};
-    menu[4] = {.text = "Download Virtual HID Broker", .cb = tray_virtualhid_download_cb};
+    menu[3] = {.text = "虚拟手柄驱动优势", .submenu = virtualhid_benefits_menu_storage().data()};
+    menu[4] = {.text = "下载虚拟手柄驱动", .cb = tray_virtualhid_download_cb};
     #else
-    menu[3] = {.text = "Download Virtual HID Broker", .cb = tray_virtualhid_download_cb};
+    menu[3] = {.text = "下载虚拟手柄驱动", .cb = tray_virtualhid_download_cb};
     #endif
     return menu;
   }
@@ -291,34 +279,25 @@ namespace system_tray {
   // Tray menu
   static struct tray tray = {
     .icon = TRAY_ICON,
-    .tooltip = PROJECT_NAME,
+    .tooltip = "CATL投屏",
   #ifdef __APPLE__
     .cb = tray_native_menu_click_cb,
   #endif
     .menu =
       (struct tray_menu[]) {
         // Tray menu labels currently use the project's English source strings.
-        {.text = "Open Sunshine", .cb = tray_open_ui_cb},
+        {.text = "打开管理界面", .cb = tray_open_ui_cb},
         {.text = "-"},
   #if defined(_WIN32) || defined(__APPLE__)
-        {.text = "Virtual HID Broker", .submenu = virtualhid_license_menu.data()},
+        {.text = "虚拟手柄驱动", .submenu = virtualhid_license_menu.data()},
         {.text = "-"},
   #endif
-        {.text = "Donate",
-         .submenu =
-           (struct tray_menu[]) {
-             {.text = "GitHub Sponsors", .cb = tray_donate_github_cb},
-             {.text = "Patreon", .cb = tray_donate_patreon_cb},
-             {.text = "PayPal", .cb = tray_donate_paypal_cb},
-             {.text = nullptr}
-           }},
-        {.text = "-"},
   // Currently display device settings are only supported on Windows
   #ifdef _WIN32
         {.text = "Reset Display Device Config", .cb = tray_reset_display_device_config_cb},
   #endif
-        {.text = "Restart", .cb = tray_restart_cb},
-        {.text = "Quit", .cb = tray_quit_cb},
+        {.text = "重启服务", .cb = tray_restart_cb},
+        {.text = "退出", .cb = tray_quit_cb},
         {.text = nullptr}
       },
   #if defined(_WIN32) || defined(__APPLE__)

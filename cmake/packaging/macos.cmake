@@ -23,22 +23,12 @@ else()
         COMPONENT Runtime)
 
     if(SUNSHINE_ENABLE_TRAY)
-        # Import Qt in this directory so its deployment commands and targets are visible here.
-        set(_sunshine_module_path "${CMAKE_MODULE_PATH}")
-        find_package(Qt6 REQUIRED COMPONENTS Core)
-        set(CMAKE_MODULE_PATH "${_sunshine_module_path}")
-        unset(_sunshine_module_path)
+        # CATL投屏 build: tray uses Qt5 runtime (full bottle available).
+        find_package(Qt5 REQUIRED COMPONENTS Core)
 
-        qt6_generate_deploy_script(
-            TARGET sunshine
-            OUTPUT_SCRIPT SUNSHINE_QT_DEPLOY_SCRIPT
-            CONTENT "
-qt6_deploy_runtime_dependencies(
-    EXECUTABLE \"$<TARGET_FILE_NAME:sunshine>.app\"
-    NO_APP_STORE_COMPLIANCE
-    NO_TRANSLATIONS
-    DEPLOY_TOOL_OPTIONS -no-codesign
-)")
+        # Qt6 deploy tooling is not available in this build; no-op deploy script.
+        set(SUNSHINE_QT_DEPLOY_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/noop-deploy.cmake")
+        file(WRITE "${SUNSHINE_QT_DEPLOY_SCRIPT}" "# Qt6 dependency deployment is disabled (Qt5 tray build)\n")
         install(SCRIPT "${SUNSHINE_QT_DEPLOY_SCRIPT}" COMPONENT Runtime)
     endif()
 

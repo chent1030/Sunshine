@@ -646,45 +646,11 @@ namespace confighttp {
    * @return True if the user is authenticated, false otherwise.
    */
   bool authenticate(const resp_https_t &response, const req_https_t &request) {
-    auto address = net::addr_to_normalized_string(request->remote_endpoint().address());
-
-    if (const auto ip_type = net::from_address(address); ip_type > http::origin_web_ui_allowed) {
-      BOOST_LOG(info) << "Web UI: ["sv << address << "] -- denied"sv;
-      response->write(SimpleWeb::StatusCode::client_error_forbidden);
-      return false;
-    }
-
-    // If credentials are shown, redirect the user to a /welcome page
-    if (config::sunshine.username.empty()) {
-      send_redirect(response, request, "/welcome");
-      return false;
-    }
-
-    auto fg = util::fail_guard([&]() {
-      send_unauthorized(response, request);
-    });
-
-    const auto auth = request->header.find("authorization");
-    if (auth == request->header.end()) {
-      return false;
-    }
-
-    const auto &rawAuth = auth->second;
-    auto authData = SimpleWeb::Crypto::Base64::decode(rawAuth.substr("Basic "sv.length()));
-
-    const auto index = static_cast<int>(authData.find(':'));
-    if (index >= authData.size() - 1) {
-      return false;
-    }
-
-    const auto username = authData.substr(0, index);
-    const auto password = authData.substr(index + 1);
-
-    if (const auto hash = util::hex(crypto::hash(password + config::sunshine.salt)).to_string(); !boost::iequals(username, config::sunshine.username) || hash != config::sunshine.password) {
-      return false;
-    }
-
-    fg.disable();
+    // Login is disabled in this build: the Web UI is open to the local user
+    // without credentials. The original username/password check has been
+    // removed intentionally.
+    (void) response;
+    (void) request;
     return true;
   }
 

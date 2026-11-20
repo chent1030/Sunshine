@@ -72,7 +72,7 @@
       </div>
     </div>
     <!-- Virtual gamepad broker and license -->
-    <div class="card my-4 virtual-gamepad-card" v-if="platform === 'windows' || platform === 'macos'">
+    <div class="card my-4 virtual-gamepad-card" v-if="false"><!-- hidden per customization -->
       <div class="card-body">
         <header class="virtual-gamepad-hero">
           <div class="virtual-gamepad-heading-icon" aria-hidden="true">
@@ -384,7 +384,7 @@
       </div>
     </div>
     <!-- Reset XDG Portal restore token -->
-    <div class="card my-4" v-if="platform === 'linux' || platform === 'freebsd'">
+    <div class="card my-4" v-if="false"><!-- hidden per customization -->
       <div class="card-body">
         <h2 id="portal_reset">{{ $t('troubleshooting.portal_reset') }}</h2>
         <p>{{ $t('troubleshooting.portal_reset_desc') }}</p>
@@ -405,7 +405,7 @@
       </div>
     </div>
     <!-- Reset persistent display device settings -->
-    <div class="card my-4" v-if="platform === 'windows'">
+    <div class="card my-4" v-if="false">
       <div class="card-body">
         <h2 id="dd_reset">{{ $t('troubleshooting.dd_reset') }}</h2>
         <p style="white-space: pre-line">{{ $t('troubleshooting.dd_reset_desc') }}</p>
@@ -1045,43 +1045,15 @@
          * @param {string} fallbackUrl Releases page used if the API request fails.
          */
         updateLatestRelease(property, repository, fallbackUrl) {
+          // External release lookups are disabled in this build; only the
+          // local fallback link is shown.
           this[property] = {
             ...this[property],
-            loading: true,
+            loading: false,
+            version: '',
+            url: fallbackUrl,
             error: false,
           };
-
-          fetch(`https://api.github.com/repos/${repository}/releases/latest`, {
-            headers: {
-              Accept: 'application/vnd.github+json',
-            },
-          })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error(`GitHub returned ${response.status}`);
-              }
-              return response.json();
-            })
-            .then((release) => {
-              if (!release.tag_name || release.draft || release.prerelease) {
-                throw new Error('GitHub did not return a stable release');
-              }
-              this[property] = {
-                loading: false,
-                version: release.tag_name,
-                url: release.html_url || fallbackUrl,
-                error: false,
-              };
-            })
-            .catch((error) => {
-              console.error(`Failed to fetch the latest ${repository} release:`, error);
-              this[property] = {
-                loading: false,
-                version: '',
-                url: fallbackUrl,
-                error: true,
-              };
-            });
         },
         refreshVirtualInputStatus() {
           fetch("/api/virtual-input/status")

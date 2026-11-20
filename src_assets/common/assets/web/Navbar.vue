@@ -2,8 +2,8 @@
   <div>
     <nav class="navbar navbar-expand-lg navbar-sunshine">
       <div class="container-fluid">
-        <RouterLink class="navbar-brand" to="/" title="Sunshine">
-          <img src="/images/logo-sunshine-45.png" height="45" alt="Sunshine">
+        <RouterLink class="navbar-brand" to="/" title="CATL投屏">
+          <img src="/images/logo-sunshine-45.png" height="45" alt="CATL投屏">
         </RouterLink>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -12,27 +12,9 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/">
-                <Home :size="18" class="icon"></Home>
-                {{ $t('navbar.home') }}
-              </RouterLink>
-            </li>
-            <li class="nav-item">
               <RouterLink class="nav-link" to="/pin">
                 <Lock :size="18" class="icon"></Lock>
                 {{ $t('navbar.pin') }}
-              </RouterLink>
-            </li>
-            <li class="nav-item">
-              <RouterLink class="nav-link" to="/apps">
-                <Layers :size="18" class="icon"></Layers>
-                {{ $t('navbar.applications') }}
-              </RouterLink>
-            </li>
-            <li class="nav-item">
-              <RouterLink class="nav-link" to="/featured">
-                <Star :size="18" class="icon"></Star>
-                {{ $t('navbar.featured') }}
               </RouterLink>
             </li>
             <li class="nav-item">
@@ -52,27 +34,6 @@
             <li class="nav-item">
               <ThemeToggle/>
             </li>
-            <li class="nav-item dropdown">
-              <button class="nav-link dropdown-toggle" type="button" id="navbarUserMenu"
-                      data-bs-toggle="dropdown" aria-expanded="false" aria-label="User menu" title="User menu">
-                <CircleUserRound :size="18" class="icon"></CircleUserRound>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUserMenu">
-                <li>
-                  <RouterLink class="dropdown-item d-flex align-items-center" to="/password">
-                    <Shield :size="18" class="icon"></Shield>
-                    {{ $t('navbar.password') }}
-                  </RouterLink>
-                </li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                  <button type="button" class="dropdown-item d-flex align-items-center" @click="logout">
-                    <LogOut :size="18" class="icon"></LogOut>
-                    {{ $t('navbar.logout') }}
-                  </button>
-                </li>
-              </ul>
-            </li>
           </ul>
         </div>
       </div>
@@ -82,7 +43,7 @@
 </template>
 
 <script>
-import { CircleUserRound, Home, Info, Layers, Lock, LogOut, Settings, Shield, Star } from '@lucide/vue'
+import { Info, Lock, Settings } from '@lucide/vue'
 import ThemeToggle from './ThemeToggle.vue'
 import Notification from './Notification.vue'
 
@@ -90,33 +51,9 @@ export default {
   components: {
     ThemeToggle,
     Notification,
-    Home,
     Lock,
-    Layers,
-    Star,
     Settings,
-    Shield,
-    Info,
-    CircleUserRound,
-    LogOut
-  },
-  methods: {
-    logout() {
-      const cacheBuster = Date.now().toString()
-      const logoutPageUrl = new URL('/logout', globalThis.location.href)
-      const request = new XMLHttpRequest()
-      const finish = () => {
-        globalThis.location.replace(logoutPageUrl.toString())
-      }
-
-      request.open('GET', '/', true, 'sunshine-logout', cacheBuster)
-      request.setRequestHeader('Cache-Control', 'no-store')
-      request.onload = finish
-      request.onerror = finish
-      request.ontimeout = finish
-      request.timeout = 5000
-      request.send()
-    }
+    Info
   }
 }
 </script>
