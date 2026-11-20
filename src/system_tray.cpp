@@ -294,7 +294,7 @@ namespace system_tray {
   #endif
   // Currently display device settings are only supported on Windows
   #ifdef _WIN32
-        {.text = "Reset Display Device Config", .cb = tray_reset_display_device_config_cb},
+        {.text = "重置显示设备配置", .cb = tray_reset_display_device_config_cb},
   #endif
         {.text = "重启服务", .cb = tray_restart_cb},
         {.text = "退出", .cb = tray_quit_cb},
@@ -346,18 +346,18 @@ namespace system_tray {
 
     switch (state) {
       case unlicensed:
-        return "Not Activated";
+        return "未激活";
       case licensed:
-        return "Licensed";
+        return "已授权";
       case expired:
-        return "Expired";
+        return "已过期";
       case disabled:
-        return "Disabled";
+        return "已停用";
       case invalid:
-        return "Invalid";
+        return "无效";
       case unavailable:
       default:
-        return "Unavailable";
+        return "不可用";
     }
   }
 
@@ -372,18 +372,18 @@ namespace system_tray {
 
     switch (state) {
       case unlicensed:
-        return "No license is active on this machine";
+        return "本机没有启用中的许可证";
       case expired:
-        return "The license on this machine has expired";
+        return "本机许可证已过期";
       case disabled:
-        return "The license on this machine is disabled";
+        return "本机许可证已停用";
       case invalid:
-        return "The license on this machine is invalid";
+        return "本机许可证无效";
       case licensed:
-        return "This machine is activated";
+        return "本机已激活";
       case unavailable:
       default:
-        return "The local license service is unavailable";
+        return "本地许可证服务不可用";
     }
   }
 
@@ -421,46 +421,46 @@ namespace system_tray {
     virtualhid_license_menu = {};
     virtualhid_license_menu_text_storage() = {};
 
-    set_virtualhid_license_menu_item(0, std::format("Status: {}", virtualhid_license_state_label(license.state)), true);
+    set_virtualhid_license_menu_item(0, std::format("状态：{}", virtualhid_license_state_label(license.state)), true);
     if (license.licensed()) {
       set_virtualhid_license_menu_item(
         1,
-        license.plan_name.empty() ? std::string {virtualhid_license_state_detail(license.state)} : std::format("Plan: {}", license.plan_name),
+        license.plan_name.empty() ? std::string {virtualhid_license_state_detail(license.state)} : std::format("套餐：{}", license.plan_name),
         true
       );
       set_virtualhid_license_menu_item(
         2,
-        license.customer_email.empty() ? "Customer: Not reported" : std::format("Customer: {}", license.customer_email),
+        license.customer_email.empty() ? "客户：未上报" : std::format("客户：{}", license.customer_email),
         true
       );
       set_virtualhid_license_menu_item(
         3,
         license.activation_limit == 0 ?
-          "Machine activation limit: Not reported" :
-          std::format("Machine activation limit: {}", license.activation_limit),
+          "激活设备上限：未上报" :
+          std::format("激活设备上限：{}", license.activation_limit),
         true
       );
     } else {
       set_virtualhid_license_menu_item(1, std::string {virtualhid_license_state_detail(license.state)}, true);
     #ifdef _WIN32
-      set_virtualhid_license_menu_item(2, "Driver-backed keyboard, mouse, and gamepads are locked", true);
+      set_virtualhid_license_menu_item(2, "驱动级别的键盘、鼠标与手柄已锁定", true);
     #else
-      set_virtualhid_license_menu_item(2, "Virtual gamepads are locked", true);
+      set_virtualhid_license_menu_item(2, "虚拟手柄已锁定", true);
     #endif
       set_virtualhid_license_menu_item(
         3,
-        license.service_available ? "License service: Available" : "License service: Unavailable",
+        license.service_available ? "许可证服务：可用" : "许可证服务：不可用",
         true
       );
     }
     virtualhid_license_menu[4] = {.text = "-"};
-    set_virtualhid_license_menu_item(5, "Get/Manage License", false, tray_virtualhid_license_cb);
+    set_virtualhid_license_menu_item(5, "获取/管理许可证", false, tray_virtualhid_license_cb);
     #ifdef _WIN32
-    set_virtualhid_license_menu_item(6, "Virtual HID Broker Benefits", false);
+    set_virtualhid_license_menu_item(6, "虚拟手柄驱动优势", false);
     virtualhid_license_menu[6].submenu = virtualhid_benefits_menu_storage().data();
-    set_virtualhid_license_menu_item(7, "Download Virtual HID Broker", false, tray_virtualhid_download_cb);
+    set_virtualhid_license_menu_item(7, "下载虚拟手柄驱动", false, tray_virtualhid_download_cb);
     #else
-    set_virtualhid_license_menu_item(6, "Download Virtual HID Broker", false, tray_virtualhid_download_cb);
+    set_virtualhid_license_menu_item(6, "下载虚拟手柄驱动", false, tray_virtualhid_download_cb);
     #endif
   }
 

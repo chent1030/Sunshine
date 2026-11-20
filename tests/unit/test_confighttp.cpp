@@ -558,6 +558,9 @@ class CsrfProtectedConfigHttpEndpointTest: public ConfigHttpTest, public testing
 class InvalidVirtualInputLicenseRequestTest: public ConfigHttpTest, public testing::WithParamInterface<invalid_license_request_t> {};
 
 TEST_P(AuthenticatedConfigHttpEndpointTest, RejectsUnauthenticatedRequest) {
+  // CATL投屏：confighttp 的 authenticate() 恒为 true（Web UI 免登录），这些用例不再适用。
+  GTEST_SKIP() << "Authentication is disabled in CATL投屏 builds";
+
   const auto &request = GetParam();
   const auto response = client->request(request.method, request.path, request.body);
   ASSERT_EQ(response->status_code, "401 Unauthorized");
@@ -625,6 +628,9 @@ INSTANTIATE_TEST_SUITE_P(
 );
 
 TEST_F(ConfigHttpTest, PairingMutationsRejectUnauthenticatedRestRequests) {
+  // CATL投屏：confighttp 的 authenticate() 恒为 true（Web UI 免登录），这些用例不再适用。
+  GTEST_SKIP() << "Authentication is disabled in CATL投屏 builds";
+
   SimpleWeb::CaseInsensitiveMultimap headers;
   headers.emplace("Content-Type", "application/json");
 
@@ -852,6 +858,9 @@ TEST_F(ConfigHttpTest, PortalTokenResetRemovesMigratedLegacyToken) {
 
 // Test: confighttp::authenticate() rejects requests without auth header
 TEST_F(ConfigHttpTest, AuthenticateRejectsNoAuth) {
+  // CATL投屏：confighttp 的 authenticate() 恒为 true（Web UI 免登录），这些用例不再适用。
+  GTEST_SKIP() << "Authentication is disabled in CATL投屏 builds";
+
   const auto response = client->request("GET", "/auth-test");
   ASSERT_EQ(response->status_code, "401 Unauthorized");
 
@@ -874,6 +883,9 @@ TEST_F(ConfigHttpTest, AuthenticateAcceptsValidCredentials) {
 
 // Test: confighttp::authenticate() rejects invalid password
 TEST_F(ConfigHttpTest, AuthenticateRejectsInvalidPassword) {
+  // CATL投屏：confighttp 的 authenticate() 恒为 true（Web UI 免登录），这些用例不再适用。
+  GTEST_SKIP() << "Authentication is disabled in CATL投屏 builds";
+
   SimpleWeb::CaseInsensitiveMultimap headers;
   headers.emplace("Authorization", create_auth_header("testuser", "wrongpass"));
 
@@ -1793,6 +1805,9 @@ TEST_F(ConfigHttpTest, VirtualInputStatusReturnsBothBackends) {
 }
 
 TEST_F(ConfigHttpTest, PermissionsEndpointRequiresAuthenticationAndCsrf) {
+  // CATL投屏：confighttp 的 authenticate() 恒为 true（Web UI 免登录），这些用例不再适用。
+  GTEST_SKIP() << "Authentication is disabled in CATL投屏 builds";
+
   SimpleWeb::CaseInsensitiveMultimap headers;
   headers.emplace("Content-Type", "application/json");
   EXPECT_EQ(client->request("GET", "/permissions-test", "", headers)->status_code, "401 Unauthorized");

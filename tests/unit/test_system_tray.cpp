@@ -87,13 +87,13 @@ namespace {
    */
   void verify_virtualhid_benefits_menu(const struct tray_menu *benefits_menu) {
     ASSERT_NE(benefits_menu, nullptr);
-    EXPECT_STREQ(benefits_menu[0].text, "Xbox One, Xbox Series, DualSense (DS5), Switch Pro, and Generic");
+    EXPECT_STREQ(benefits_menu[0].text, "Xbox One/Xbox Series/DualSense (DS5)/Switch Pro 及通用手柄");
     EXPECT_EQ(benefits_menu[0].disabled, 1);
-    EXPECT_STREQ(benefits_menu[1].text, "Raw Input keyboard and mouse for physical-style input");
+    EXPECT_STREQ(benefits_menu[1].text, "物理手柄风格的键盘鼠标 Raw Input");
     EXPECT_EQ(benefits_menu[1].disabled, 1);
-    EXPECT_STREQ(benefits_menu[2].text, "Motion, touchpads, LEDs, and adaptive triggers where supported");
+    EXPECT_STREQ(benefits_menu[2].text, "支持的体感/触摸板/LED/自适应扳机");
     EXPECT_EQ(benefits_menu[2].disabled, 1);
-    EXPECT_STREQ(benefits_menu[3].text, "Actively developed and supported by LizardByte");
+    EXPECT_STREQ(benefits_menu[3].text, "由 LizardByte 持续开发维护");
     EXPECT_EQ(benefits_menu[3].disabled, 1);
     EXPECT_EQ(benefits_menu[4].text, nullptr);
   }
@@ -106,12 +106,12 @@ namespace {
   void verify_virtualhid_actions_menu(const struct tray_menu *license_menu) {
     ASSERT_NE(license_menu, nullptr);
     EXPECT_STREQ(license_menu[4].text, "-");
-    EXPECT_STREQ(license_menu[5].text, "Get/Manage License");
+    EXPECT_STREQ(license_menu[5].text, "获取/管理许可证");
     EXPECT_NE(license_menu[5].cb, nullptr);
-    EXPECT_STREQ(license_menu[6].text, "Virtual HID Broker Benefits");
+    EXPECT_STREQ(license_menu[6].text, "虚拟手柄驱动优势");
     EXPECT_EQ(license_menu[6].cb, nullptr);
     verify_virtualhid_benefits_menu(license_menu[6].submenu);
-    EXPECT_STREQ(license_menu[7].text, "Download Virtual HID Broker");
+    EXPECT_STREQ(license_menu[7].text, "下载虚拟手柄驱动");
     EXPECT_NE(license_menu[7].cb, nullptr);
     EXPECT_EQ(license_menu[8].text, nullptr);
   }
@@ -124,67 +124,53 @@ namespace {
     const auto &tray_data = system_tray::tray_data_for_testing();
     ASSERT_NE(tray_data.menu, nullptr);
 
-    EXPECT_STREQ(tray_data.menu[0].text, "Open Sunshine");
+    EXPECT_STREQ(tray_data.menu[0].text, "打开管理界面");
     EXPECT_NE(tray_data.menu[0].cb, nullptr);
     EXPECT_STREQ(tray_data.menu[1].text, "-");
     EXPECT_EQ(tray_data.menu[1].cb, nullptr);
 
   #if defined(_WIN32) || defined(__APPLE__)
-    EXPECT_STREQ(tray_data.menu[2].text, "Virtual HID Broker");
+    EXPECT_STREQ(tray_data.menu[2].text, "虚拟手柄驱动");
     ASSERT_NE(tray_data.menu[2].submenu, nullptr);
-    EXPECT_STREQ(tray_data.menu[2].submenu[0].text, "Status: Checking");
+    EXPECT_STREQ(tray_data.menu[2].submenu[0].text, "状态：检查中");
     EXPECT_EQ(tray_data.menu[2].submenu[0].disabled, 1);
     EXPECT_STREQ(tray_data.menu[2].submenu[1].text, "-");
-    EXPECT_STREQ(tray_data.menu[2].submenu[2].text, "Get/Manage License");
+    EXPECT_STREQ(tray_data.menu[2].submenu[2].text, "获取/管理许可证");
     EXPECT_NE(tray_data.menu[2].submenu[2].cb, nullptr);
     #ifdef _WIN32
-    EXPECT_STREQ(tray_data.menu[2].submenu[3].text, "Virtual HID Broker Benefits");
+    EXPECT_STREQ(tray_data.menu[2].submenu[3].text, "虚拟手柄驱动优势");
     EXPECT_EQ(tray_data.menu[2].submenu[3].cb, nullptr);
     verify_virtualhid_benefits_menu(tray_data.menu[2].submenu[3].submenu);
-    EXPECT_STREQ(tray_data.menu[2].submenu[4].text, "Download Virtual HID Broker");
+    EXPECT_STREQ(tray_data.menu[2].submenu[4].text, "下载虚拟手柄驱动");
     EXPECT_NE(tray_data.menu[2].submenu[4].cb, nullptr);
     EXPECT_EQ(tray_data.menu[2].submenu[5].text, nullptr);
     #else
-    EXPECT_STREQ(tray_data.menu[2].submenu[3].text, "Download Virtual HID Broker");
+    EXPECT_STREQ(tray_data.menu[2].submenu[3].text, "下载虚拟手柄驱动");
     EXPECT_NE(tray_data.menu[2].submenu[3].cb, nullptr);
     EXPECT_EQ(tray_data.menu[2].submenu[4].text, nullptr);
     #endif
     EXPECT_STREQ(tray_data.menu[3].text, "-");
-    EXPECT_STREQ(tray_data.menu[4].text, "Donate");
-    ASSERT_NE(tray_data.menu[4].submenu, nullptr);
-    EXPECT_STREQ(tray_data.menu[4].submenu[0].text, "GitHub Sponsors");
-    EXPECT_STREQ(tray_data.menu[4].submenu[1].text, "Patreon");
-    EXPECT_STREQ(tray_data.menu[4].submenu[2].text, "PayPal");
-    EXPECT_EQ(tray_data.menu[4].submenu[3].text, nullptr);
-    EXPECT_STREQ(tray_data.menu[5].text, "-");
     #ifdef _WIN32
-    EXPECT_STREQ(tray_data.menu[6].text, "Reset Display Device Config");
-    EXPECT_NE(tray_data.menu[6].cb, nullptr);
-    EXPECT_STREQ(tray_data.menu[7].text, "Restart");
-    EXPECT_NE(tray_data.menu[7].cb, nullptr);
-    EXPECT_STREQ(tray_data.menu[8].text, "Quit");
-    EXPECT_NE(tray_data.menu[8].cb, nullptr);
-    EXPECT_EQ(tray_data.menu[9].text, nullptr);
-    #else
-    EXPECT_STREQ(tray_data.menu[6].text, "Restart");
-    EXPECT_NE(tray_data.menu[6].cb, nullptr);
-    EXPECT_STREQ(tray_data.menu[7].text, "Quit");
-    EXPECT_NE(tray_data.menu[7].cb, nullptr);
-    EXPECT_EQ(tray_data.menu[8].text, nullptr);
-    #endif
-  #else
-    EXPECT_STREQ(tray_data.menu[2].text, "Donate");
-    ASSERT_NE(tray_data.menu[2].submenu, nullptr);
-    EXPECT_STREQ(tray_data.menu[2].submenu[0].text, "GitHub Sponsors");
-    EXPECT_STREQ(tray_data.menu[2].submenu[1].text, "Patreon");
-    EXPECT_STREQ(tray_data.menu[2].submenu[2].text, "PayPal");
-    EXPECT_EQ(tray_data.menu[2].submenu[3].text, nullptr);
-    EXPECT_STREQ(tray_data.menu[3].text, "-");
-    EXPECT_STREQ(tray_data.menu[4].text, "Restart");
+    EXPECT_STREQ(tray_data.menu[4].text, "重置显示设备配置");
     EXPECT_NE(tray_data.menu[4].cb, nullptr);
-    EXPECT_STREQ(tray_data.menu[5].text, "Quit");
+    EXPECT_STREQ(tray_data.menu[5].text, "重启服务");
+    EXPECT_NE(tray_data.menu[5].cb, nullptr);
+    EXPECT_STREQ(tray_data.menu[6].text, "退出");
+    EXPECT_NE(tray_data.menu[6].cb, nullptr);
+    EXPECT_EQ(tray_data.menu[7].text, nullptr);
+    #else
+    EXPECT_STREQ(tray_data.menu[4].text, "重启服务");
+    EXPECT_NE(tray_data.menu[4].cb, nullptr);
+    EXPECT_STREQ(tray_data.menu[5].text, "退出");
     EXPECT_NE(tray_data.menu[5].cb, nullptr);
     EXPECT_EQ(tray_data.menu[6].text, nullptr);
+    #endif
+  #else
+    EXPECT_STREQ(tray_data.menu[2].text, "重启服务");
+    EXPECT_NE(tray_data.menu[2].cb, nullptr);
+    EXPECT_STREQ(tray_data.menu[3].text, "退出");
+    EXPECT_NE(tray_data.menu[3].cb, nullptr);
+    EXPECT_EQ(tray_data.menu[4].text, nullptr);
   #endif
   }
 
@@ -348,7 +334,7 @@ TEST_F(SystemTrayTest, LeftClickUsesNativeMacOSMenu) {
 
   tray_data.cb(nullptr);
 
-  EXPECT_STREQ(tray_data.menu[0].text, "Open Sunshine");
+  EXPECT_STREQ(tray_data.menu[0].text, "打开管理界面");
   EXPECT_FALSE(system_tray::tray_initialized_for_testing());
 }
   #endif
@@ -376,7 +362,7 @@ TEST_F(SystemTrayTest, PreparesVirtualHidMenuFromCurrentLicenseStatus) {
   const auto &tray_data = system_tray::tray_data_for_testing();
   ASSERT_NE(tray_data.menu[2].submenu, nullptr);
   ASSERT_NE(tray_data.menu[2].submenu[0].text, nullptr);
-  EXPECT_STRNE(tray_data.menu[2].submenu[0].text, "Status: Checking");
+  EXPECT_STRNE(tray_data.menu[2].submenu[0].text, "状态：检查中");
 }
 
 TEST_F(SystemTrayTest, PreparesLicensedVirtualHidMenuBeforeInitialization) {
@@ -393,12 +379,12 @@ TEST_F(SystemTrayTest, PreparesLicensedVirtualHidMenuBeforeInitialization) {
   const auto &tray_data = system_tray::tray_data_for_testing();
   const auto *license_menu = tray_data.menu[2].submenu;
   ASSERT_NE(license_menu, nullptr);
-  EXPECT_STREQ(license_menu[0].text, "Status: Licensed");
+  EXPECT_STREQ(license_menu[0].text, "状态：已授权");
   EXPECT_STREQ(license_menu[1].text, "Plan: Yearly");
   EXPECT_STREQ(license_menu[2].text, "Customer: customer@example.com");
   EXPECT_STREQ(license_menu[3].text, "Machine activation limit: 5");
   EXPECT_STREQ(license_menu[4].text, "-");
-  EXPECT_STREQ(license_menu[5].text, "Get/Manage License");
+  EXPECT_STREQ(license_menu[5].text, "获取/管理许可证");
   EXPECT_NE(license_menu[5].cb, nullptr);
   verify_virtualhid_actions_menu(license_menu);
   EXPECT_EQ(tray_data.notification_title, nullptr);
@@ -507,7 +493,7 @@ TEST_F(SystemTrayTest, NoneSelectionSuppressesWindowsVirtualHidNotifications) {
   EXPECT_EQ(tray_data.notification_title, nullptr);
   EXPECT_EQ(tray_data.notification_text, nullptr);
   EXPECT_EQ(tray_data.notification_cb, nullptr);
-  EXPECT_STREQ(tray_data.menu[2].submenu[0].text, "Status: Unavailable");
+  EXPECT_STREQ(tray_data.menu[2].submenu[0].text, "状态：不可用");
 
   const auto supported_versions = std::format(">= {}", LIBVIRTUALHID_MINIMUM_VERSION);
   system_tray::update_tray_virtualhid_driver(true, "2026.829.2338.54", false, supported_versions);  // NOSONAR(cpp:S1313): not IP addresses
@@ -532,10 +518,10 @@ TEST_P(UnlicensedVirtualHidTrayTest, PreparesMenuAndStartupNotification) {
   const auto &tray_data = system_tray::tray_data_for_testing();
   const auto *license_menu = tray_data.menu[2].submenu;
   ASSERT_NE(license_menu, nullptr);
-  EXPECT_STREQ(license_menu[0].text, std::format("Status: {}", state_label).c_str());
+  EXPECT_STREQ(license_menu[0].text, std::format("状态：{}", state_label).c_str());
   EXPECT_STREQ(license_menu[1].text, state_detail);
-  EXPECT_STREQ(license_menu[2].text, "Driver-backed keyboard, mouse, and gamepads are locked");
-  EXPECT_STREQ(license_menu[3].text, service_available ? "License service: Available" : "License service: Unavailable");
+  EXPECT_STREQ(license_menu[2].text, "驱动级别的键盘、鼠标与手柄已锁定");
+  EXPECT_STREQ(license_menu[3].text, service_available ? "许可证服务：可用" : "许可证服务：不可用");
   verify_virtualhid_actions_menu(license_menu);
   EXPECT_STREQ(tray_data.notification_title, "Virtual HID Broker License");
   EXPECT_STREQ(
@@ -559,10 +545,10 @@ INSTANTIATE_TEST_SUITE_P(
   UnlicensedVirtualHidTrayTest,
   testing::Values(
     std::tuple {lvh::LicenseState::unavailable, "Unavailable", "The local license service is unavailable", false},
-    std::tuple {lvh::LicenseState::unlicensed, "Not Activated", "No license is active on this machine", true},
-    std::tuple {lvh::LicenseState::expired, "Expired", "The license on this machine has expired", true},
-    std::tuple {lvh::LicenseState::disabled, "Disabled", "The license on this machine is disabled", true},
-    std::tuple {lvh::LicenseState::invalid, "Invalid", "The license on this machine is invalid", true}
+    std::tuple {lvh::LicenseState::unlicensed, "未激活", "本机没有启用中的许可证", true},
+    std::tuple {lvh::LicenseState::expired, "已过期", "本机许可证已过期", true},
+    std::tuple {lvh::LicenseState::disabled, "已停用", "本机许可证已停用", true},
+    std::tuple {lvh::LicenseState::invalid, "无效", "本机许可证无效", true}
   )
 );
   #endif
@@ -612,14 +598,14 @@ TEST_F(SystemTrayTest, ShowsLicensedMacBrokerDetailsBeforeInitialization) {
   ASSERT_EQ(tray_data.iconPathCount, 5);
   const auto *menu = tray_data.menu[2].submenu;
   ASSERT_NE(menu, nullptr);
-  EXPECT_STREQ(menu[0].text, "Status: Licensed");
-  EXPECT_STREQ(menu[1].text, "Plan: Yearly");
-  EXPECT_STREQ(menu[2].text, "Customer: customer@example.com");
-  EXPECT_STREQ(menu[3].text, "Machine activation limit: 5");
+  EXPECT_STREQ(menu[0].text, "状态：已授权");
+  EXPECT_STREQ(menu[1].text, "套餐：Yearly");
+  EXPECT_STREQ(menu[2].text, "客户：customer@example.com");
+  EXPECT_STREQ(menu[3].text, "激活设备上限：5");
   EXPECT_STREQ(menu[4].text, "-");
-  EXPECT_STREQ(menu[5].text, "Get/Manage License");
+  EXPECT_STREQ(menu[5].text, "获取/管理许可证");
   EXPECT_NE(menu[5].cb, nullptr);
-  EXPECT_STREQ(menu[6].text, "Download Virtual HID Broker");
+  EXPECT_STREQ(menu[6].text, "下载虚拟手柄驱动");
   EXPECT_NE(menu[6].cb, nullptr);
   EXPECT_EQ(menu[7].text, nullptr);
   EXPECT_EQ(tray_data.notification_title, nullptr);
@@ -635,10 +621,10 @@ TEST_F(SystemTrayTest, ShowsMacBrokerLicenseAndAvailabilityWithOptionalStartupNo
   const auto &tray_data = system_tray::tray_data_for_testing();
   const auto *menu = tray_data.menu[2].submenu;
   ASSERT_NE(menu, nullptr);
-  EXPECT_STREQ(menu[0].text, "Status: Not Activated");
-  EXPECT_STREQ(menu[1].text, "No license is active on this machine");
-  EXPECT_STREQ(menu[2].text, "Virtual gamepads are locked");
-  EXPECT_STREQ(menu[3].text, "License service: Available");
+  EXPECT_STREQ(menu[0].text, "状态：未激活");
+  EXPECT_STREQ(menu[1].text, "本机没有启用中的许可证");
+  EXPECT_STREQ(menu[2].text, "虚拟手柄已锁定");
+  EXPECT_STREQ(menu[3].text, "许可证服务：可用");
   EXPECT_STREQ(tray_data.notification_title, "Virtual HID Broker License");
   EXPECT_STREQ(tray_data.notification_text, "Activate a machine license to use virtual gamepads. Click to manage the license.");
   EXPECT_STREQ(tray_data.notification_icon, tray_data.allIconPaths[4]);
@@ -647,8 +633,8 @@ TEST_F(SystemTrayTest, ShowsMacBrokerLicenseAndAvailabilityWithOptionalStartupNo
   license.service_available = false;
   license.state = lvh::LicenseState::unavailable;
   system_tray::update_tray_virtualhid_license(license, true);
-  EXPECT_STREQ(menu[0].text, "Status: Unavailable");
-  EXPECT_STREQ(menu[3].text, "License service: Unavailable");
+  EXPECT_STREQ(menu[0].text, "状态：不可用");
+  EXPECT_STREQ(menu[3].text, "许可证服务：不可用");
   EXPECT_STREQ(tray_data.notification_title, "Virtual HID Broker Is Unavailable");
   EXPECT_STREQ(tray_data.notification_text, "Install and start Virtual HID Broker to use virtual gamepads. Click to download.");
   EXPECT_STREQ(tray_data.notification_icon, tray_data.allIconPaths[4]);
@@ -662,7 +648,7 @@ TEST_F(SystemTrayTest, ShowsMacBrokerLicenseAndAvailabilityWithOptionalStartupNo
   system_tray::update_tray_virtualhid_license(license, true);
   EXPECT_EQ(tray_data.notification_title, nullptr);
   EXPECT_EQ(tray_data.notification_cb, nullptr);
-  EXPECT_STREQ(menu[0].text, "Status: Unavailable");
+  EXPECT_STREQ(menu[0].text, "状态：不可用");
 
   config::input.gamepad_driver = config::GAMEPAD_DRIVER_VIRTUALHID;
   config::input.controller = false;

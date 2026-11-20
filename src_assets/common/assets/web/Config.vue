@@ -156,6 +156,8 @@
   } from '@lucide/vue'
 
   const ENCODER_TAB_IDS = new Set(["nv", "amd", "qsv", "vaapi", "vt", "vulkan", "sw"]);
+  // CATL投屏：Input 标签在界面上隐藏，配置项仍保留在 config_tabs.json 中供后端与搜索使用。
+  const HIDDEN_TAB_IDS = new Set(["input"]);
 
   /**
    * Compare configuration values without coercing their types.
@@ -225,7 +227,7 @@
     },
     computed: {
       generalTabs() {
-        return this.tabs.filter(tab => !ENCODER_TAB_IDS.has(tab.id));
+        return this.tabs.filter(tab => !ENCODER_TAB_IDS.has(tab.id) && !HIDDEN_TAB_IDS.has(tab.id));
       },
       encoderTabs() {
         return this.tabs.filter(tab => ENCODER_TAB_IDS.has(tab.id));
