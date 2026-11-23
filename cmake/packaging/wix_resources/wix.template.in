@@ -8,6 +8,7 @@
     >
     <Package
         Name="CATL投屏"
+        Codepage="936"
         Version="$(var.CPACK_PACKAGE_VERSION)"
         Manufacturer="$(var.CPACK_PACKAGE_VENDOR)"
         UpgradeCode="$(var.CPACK_WIX_UPGRADE_GUID)"
