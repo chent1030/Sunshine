@@ -59,6 +59,9 @@ endif()
 set(CPACK_WIX_ROOT "${WIX_TOOL_PATH}")
 set(CPACK_WIX_UPGRADE_GUID "512A3D1B-BE16-401B-A0D1-59BBA3942FB8")
 
+# Display name for the installer wizard, Start Menu shortcut and Add/Remove Programs.
+set(CPACK_PACKAGE_NAME "CATL投屏")
+
 # Installer metadata
 set(CPACK_WIX_HELP_LINK "https://docs.lizardbyte.dev/projects/sunshine/latest/md_docs_2getting__started.html")
 set(CPACK_WIX_PRODUCT_ICON "${SUNSHINE_ICON_PATH}")

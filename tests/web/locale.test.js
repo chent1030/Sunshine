@@ -38,16 +38,17 @@ describe('locale initialization', () => {
     ['an unsupported locale', 'unsupported'],
     ['a prototype property', '__proto__'],
     ['a non-string value', null],
-  ])('falls back to English for %s', async (_description, locale) => {
-    vi.stubGlobal('fetch', vi.fn(async () => ({
-      json: async () => ({ locale }),
+  ])('falls back to Chinese for %s', async (_description, locale) => {
+    vi.stubGlobal('fetch', vi.fn(async url => ({
+      json: async () => (url.includes('configLocale') ? { locale } : { greeting: '你好' }),
     })))
 
     const i18n = await createSunshineI18n()
 
-    expect(document.documentElement.lang).toBe('en')
-    expect(i18n.locale).toBe('en')
-    expect(Object.keys(i18n.messages)).toEqual(['en'])
+    expect(fetch).toHaveBeenCalledWith('./assets/locale/zh.json')
+    expect(document.documentElement.lang).toBe('zh')
+    expect(i18n.locale).toBe('zh')
+    expect(Object.keys(i18n.messages)).toEqual(['en', 'zh'])
   })
 
   it('falls back to English when a bundled translation fails to load', async () => {

@@ -63,13 +63,13 @@ consent prompt for directory ACLs, so the Web UI shows setup steps for correctin
     <tr>
         <td>Default</td>
         <td colspan="2">@code{}
-            en
+            zh
             @endcode</td>
     </tr>
     <tr>
         <td>Example</td>
         <td colspan="2">@code{}
-            locale = en
+            locale = zh
             @endcode</td>
     </tr>
     <tr>

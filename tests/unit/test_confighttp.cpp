@@ -1734,7 +1734,7 @@ TEST(ConfigHttpDriverStatusTest, BuildDriverStatus_NotInstalledIsNotCompatible) 
   const auto status = confighttp::build_driver_status(false, "", "");
 
   ASSERT_FALSE(status["installed"].get<bool>());
-  ASSERT_EQ(status["supported_versions"].get<std::string>(), "Any");
+  ASSERT_EQ(status["supported_versions"].get<std::string>(), "");
   ASSERT_FALSE(status["development_version"].get<bool>());
   ASSERT_FALSE(status["version_compatible"].get<bool>());
 }

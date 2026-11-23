@@ -216,19 +216,19 @@ namespace {
    */
   #ifndef _WIN32
   void verify_state_transitions() {
-    verify_state(0, PROJECT_NAME, nullptr, nullptr, std::nullopt, false);
+    verify_state(0, "CATL投屏", nullptr, nullptr, std::nullopt, false);
 
     system_tray::update_tray_playing("Moonlight");
-    verify_state(2, "Streaming started for Moonlight", "Stream Started", "Streaming started for Moonlight", 2, false);
+    verify_state(2, "已开始串流 Moonlight", "串流已开始", "已开始串流 Moonlight", 2, false);
 
     system_tray::update_tray_pausing("Moonlight");
-    verify_state(3, "Streaming paused for Moonlight", "Stream Paused", "Streaming paused for Moonlight", 3, false);
+    verify_state(3, "串流已暂停 Moonlight", "串流已暂停", "串流已暂停 Moonlight", 3, false);
 
     system_tray::update_tray_stopped("Moonlight");
-    verify_state(0, PROJECT_NAME, "Application Stopped", "Application Moonlight successfully stopped", 0, false);
+    verify_state(0, "CATL投屏", "应用已停止", "应用 Moonlight 已成功停止", 0, false);
 
     system_tray::update_tray_require_pin();
-    verify_state(0, PROJECT_NAME, "Incoming Pairing Request", "Click here to complete the pairing process", 1, true);
+    verify_state(0, "CATL投屏", "收到配对请求", "点击此处完成配对", 1, true);
   }
   #endif
 }  // namespace
@@ -318,7 +318,7 @@ TEST_F(SystemTrayTest, UpdatesAreIgnoredBeforeInitialization) {
 
   const auto &tray_data = system_tray::tray_data_for_testing();
   EXPECT_STREQ(tray_data.icon, tray_data.allIconPaths[0]);
-  EXPECT_STREQ(tray_data.tooltip, PROJECT_NAME);
+  EXPECT_STREQ(tray_data.tooltip, "CATL投屏");
   EXPECT_EQ(tray_data.notification_title, nullptr);
   EXPECT_EQ(tray_data.notification_text, nullptr);
   EXPECT_EQ(tray_data.notification_icon, nullptr);
@@ -411,10 +411,10 @@ TEST_F(SystemTrayTest, PromptsForUnsetGamepadDriverEvenWhenLicensed) {
   system_tray::update_tray_virtualhid_license(license, false);
 
   const auto &tray_data = system_tray::tray_data_for_testing();
-  EXPECT_STREQ(tray_data.notification_title, "Choose a Gamepad Backend");
+  EXPECT_STREQ(tray_data.notification_title, "请选择虚拟手柄后端");
   EXPECT_STREQ(
     tray_data.notification_text,
-    "Choose a gamepad backend in Input settings. Virtual HID Broker is a paid upgrade; ViGEmBus is limited and has reached end of life."
+    "请在输入设置中选择虚拟手柄后端。Virtual HID Broker 为付费升级；ViGEmBus 功能受限且已停止维护。"
   );
   EXPECT_STREQ(tray_data.notification_icon, tray_data.allIconPaths[4]);
   EXPECT_NE(tray_data.notification_cb, nullptr);
@@ -426,10 +426,10 @@ TEST_F(SystemTrayTest, NotifiesWhenVirtualHidDriverIsUnsupported) {
 
   const auto &tray_data = system_tray::tray_data_for_testing();
   const auto expected_notification = std::format(
-    "Installed Virtual HID Broker v2026.829.2338.54 is not supported by this version of Sunshine. Supported versions: {}. Restart Sunshine after updating. Click for instructions.",
+    "已安装的 Virtual HID Broker v2026.829.2338.54 不受本版本 CATL投屏 支持。支持的版本：{}。更新后请重启 CATL投屏。点击查看操作说明。",
     supported_versions
   );
-  EXPECT_STREQ(tray_data.notification_title, "Update Virtual HID Broker");
+  EXPECT_STREQ(tray_data.notification_title, "更新 Virtual HID Broker");
   EXPECT_STREQ(tray_data.notification_text, expected_notification.c_str());
   EXPECT_STREQ(tray_data.notification_icon, tray_data.allIconPaths[4]);
   EXPECT_NE(tray_data.notification_cb, nullptr);
@@ -523,10 +523,10 @@ TEST_P(UnlicensedVirtualHidTrayTest, PreparesMenuAndStartupNotification) {
   EXPECT_STREQ(license_menu[2].text, "驱动级别的键盘、鼠标与手柄已锁定");
   EXPECT_STREQ(license_menu[3].text, service_available ? "许可证服务：可用" : "许可证服务：不可用");
   verify_virtualhid_actions_menu(license_menu);
-  EXPECT_STREQ(tray_data.notification_title, "Virtual HID Broker License");
+  EXPECT_STREQ(tray_data.notification_title, "Virtual HID Broker 许可证");
   EXPECT_STREQ(
     tray_data.notification_text,
-    "Get or manage a license, or use the limited, end-of-life ViGEmBus driver."
+    "获取或管理许可证，或使用功能受限、已停止维护的 ViGEmBus 驱动。"
   );
   EXPECT_STREQ(tray_data.notification_icon, tray_data.allIconPaths[4]);
   EXPECT_NE(tray_data.notification_cb, nullptr);
@@ -560,10 +560,10 @@ TEST_F(SystemTrayTest, NotifiesWhenMacBrokerVersionIsUnsupported) {
 
   const auto &tray_data = system_tray::tray_data_for_testing();
   const auto expected_notification = std::format(
-    "Installed Virtual HID Broker v2026.829.2338 is not supported by this version of Sunshine. Supported versions: {}. Restart Sunshine after updating. Click for instructions.",
+    "已安装的 Virtual HID Broker v2026.829.2338 不受本版本 CATL投屏 支持。支持的版本：{}。更新后请重启 CATL投屏。点击查看操作说明。",
     supported_versions
   );
-  EXPECT_STREQ(tray_data.notification_title, "Update Virtual HID Broker");
+  EXPECT_STREQ(tray_data.notification_title, "更新 Virtual HID Broker");
   EXPECT_STREQ(tray_data.notification_text, expected_notification.c_str());
   EXPECT_STREQ(tray_data.notification_icon, tray_data.allIconPaths[4]);
   EXPECT_NE(tray_data.notification_cb, nullptr);
@@ -580,7 +580,7 @@ TEST_F(SystemTrayTest, MacBrokerVersionNotificationRespectsDisabledGamepads) {
 
   config::input.gamepad_driver.clear();
   system_tray::update_tray_virtualhid_driver(true, "2026.829.2338", false, supported_versions);  // NOSONAR(cpp:S1313): not an IP address
-  EXPECT_STREQ(tray_data.notification_title, "Update Virtual HID Broker");
+  EXPECT_STREQ(tray_data.notification_title, "更新 Virtual HID Broker");
 }
 
 TEST_F(SystemTrayTest, ShowsLicensedMacBrokerDetailsBeforeInitialization) {
@@ -625,8 +625,8 @@ TEST_F(SystemTrayTest, ShowsMacBrokerLicenseAndAvailabilityWithOptionalStartupNo
   EXPECT_STREQ(menu[1].text, "本机没有启用中的许可证");
   EXPECT_STREQ(menu[2].text, "虚拟手柄已锁定");
   EXPECT_STREQ(menu[3].text, "许可证服务：可用");
-  EXPECT_STREQ(tray_data.notification_title, "Virtual HID Broker License");
-  EXPECT_STREQ(tray_data.notification_text, "Activate a machine license to use virtual gamepads. Click to manage the license.");
+  EXPECT_STREQ(tray_data.notification_title, "Virtual HID Broker 许可证");
+  EXPECT_STREQ(tray_data.notification_text, "激活设备许可证以使用虚拟手柄。点击管理许可证。");
   EXPECT_STREQ(tray_data.notification_icon, tray_data.allIconPaths[4]);
   EXPECT_NE(tray_data.notification_cb, nullptr);
 
@@ -635,8 +635,8 @@ TEST_F(SystemTrayTest, ShowsMacBrokerLicenseAndAvailabilityWithOptionalStartupNo
   system_tray::update_tray_virtualhid_license(license, true);
   EXPECT_STREQ(menu[0].text, "状态：不可用");
   EXPECT_STREQ(menu[3].text, "许可证服务：不可用");
-  EXPECT_STREQ(tray_data.notification_title, "Virtual HID Broker Is Unavailable");
-  EXPECT_STREQ(tray_data.notification_text, "Install and start Virtual HID Broker to use virtual gamepads. Click to download.");
+  EXPECT_STREQ(tray_data.notification_title, "Virtual HID Broker 不可用");
+  EXPECT_STREQ(tray_data.notification_text, "安装并启动 Virtual HID Broker 以使用虚拟手柄。点击下载。");
   EXPECT_STREQ(tray_data.notification_icon, tray_data.allIconPaths[4]);
   EXPECT_NE(tray_data.notification_cb, nullptr);
 
@@ -814,7 +814,7 @@ TEST_F(SystemTrayVisualTest, CapturesIconTooltipNotificationsAndMenu) {
   }
 
   verify_menu();
-  verify_state(0, PROJECT_NAME, nullptr, nullptr, std::nullopt, false);
+  verify_state(0, "CATL投屏", nullptr, nullptr, std::nullopt, false);
   EXPECT_TRUE(screenshot::capture("sunshine_tray_initial"));
 
   const int tooltip_position_result = tray_position_mouse_over_icon();
@@ -833,16 +833,16 @@ TEST_F(SystemTrayVisualTest, CapturesIconTooltipNotificationsAndMenu) {
 
   dismissNativeNotifications();
   system_tray::update_tray_playing("Moonlight");
-  verify_state(2, "Streaming started for Moonlight", "Stream Started", "Streaming started for Moonlight", 2, false);
+  verify_state(2, "已开始串流 Moonlight", "串流已开始", "已开始串流 Moonlight", 2, false);
   capture_notification("sunshine_tray_streaming");
   system_tray::update_tray_pausing("Moonlight");
-  verify_state(3, "Streaming paused for Moonlight", "Stream Paused", "Streaming paused for Moonlight", 3, false);
+  verify_state(3, "串流已暂停 Moonlight", "串流已暂停", "串流已暂停 Moonlight", 3, false);
   capture_notification("sunshine_tray_paused");
   system_tray::update_tray_stopped("Moonlight");
-  verify_state(0, PROJECT_NAME, "Application Stopped", "Application Moonlight successfully stopped", 0, false);
+  verify_state(0, "CATL投屏", "应用已停止", "应用 Moonlight 已成功停止", 0, false);
   capture_notification("sunshine_tray_stopped");
   system_tray::update_tray_require_pin();
-  verify_state(0, PROJECT_NAME, "Incoming Pairing Request", "Click here to complete the pairing process", 1, true);
+  verify_state(0, "CATL投屏", "收到配对请求", "点击此处完成配对", 1, true);
   capture_notification("sunshine_tray_pairing_request");
 
   int menu_position_result = -1;

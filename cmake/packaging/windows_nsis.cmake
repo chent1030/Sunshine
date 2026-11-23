@@ -1,4 +1,7 @@
 # NSIS Packaging
+
+# Display name for the installer wizard, Start Menu shortcut and folder.
+set(CPACK_PACKAGE_NAME "CATL投屏")
 # see options at: https://cmake.org/cmake/help/latest/cpack_gen/nsis.html
 
 set(CPACK_NSIS_INSTALLED_ICON_NAME "${PROJECT__DIR}\\\\${PROJECT_EXE}")

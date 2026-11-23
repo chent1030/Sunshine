@@ -31,15 +31,18 @@ const localePaths = new Map([
 /**
  * @brief Resolve a configured locale to a bundled translation file.
  *
+ * Unconfigured or unsupported locales fall back to Simplified Chinese, the
+ * default display language of this build.
+ *
  * @param {unknown} configuredLocale Locale returned by the configuration API.
- * @return {string} Supported locale identifier or the English fallback.
+ * @return {string} Supported locale identifier or the Chinese default.
  */
 function resolveLocale(configuredLocale) {
     if (typeof configuredLocale !== 'string') {
-        return 'en';
+        return 'zh';
     }
 
-    return configuredLocale === 'en' || localePaths.has(configuredLocale) ? configuredLocale : 'en';
+    return configuredLocale === 'en' || localePaths.has(configuredLocale) ? configuredLocale : 'zh';
 }
 
 /**

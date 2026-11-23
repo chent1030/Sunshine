@@ -321,7 +321,7 @@ namespace system_tray {
   void reset_tray_data_for_testing() {
     const std::scoped_lock lock(tray_state_mutex());
     tray.icon = tray.allIconPaths[0];
-    tray.tooltip = PROJECT_NAME;
+    tray.tooltip = "CATL投屏";
     tray.notification_icon = nullptr;
     tray.notification_text = nullptr;
     tray.notification_title = nullptr;
@@ -481,17 +481,17 @@ namespace system_tray {
 
     #ifdef _WIN32
     if (config::input.controller && config::input.gamepad_driver.empty()) {
-      tray.notification_title = "Choose a Gamepad Backend";
+      tray.notification_title = "请选择虚拟手柄后端";
       tray.notification_text =
-        "Choose a gamepad backend in Input settings. Virtual HID Broker is a paid upgrade; ViGEmBus is limited and has reached end of life.";
+        "请在输入设置中选择虚拟手柄后端。Virtual HID Broker 为付费升级；ViGEmBus 功能受限且已停止维护。";
       tray.notification_icon = tray.allIconPaths[4];
       tray.notification_cb = []() {
         launch_ui("/config#gamepad_driver");
       };
     } else if (config::input.controller && config::input.gamepad_driver != config::GAMEPAD_DRIVER_NONE && config::input.gamepad_driver != config::GAMEPAD_DRIVER_VIGEMBUS && notify_if_unlicensed && !license.licensed()) {
-      tray.notification_title = "Virtual HID Broker License";
+      tray.notification_title = "Virtual HID Broker 许可证";
       tray.notification_text =
-        "Get or manage a license, or use the limited, end-of-life ViGEmBus driver.";
+        "获取或管理许可证，或使用功能受限、已停止维护的 ViGEmBus 驱动。";
       tray.notification_icon = tray.allIconPaths[4];
       tray.notification_cb = []() {
         launch_ui("/troubleshooting#virtualhid-license");
@@ -500,14 +500,14 @@ namespace system_tray {
     #else
     if (config::input.controller && config::input.gamepad_driver != config::GAMEPAD_DRIVER_NONE && notify_if_unlicensed && !license.licensed()) {
       if (license.service_available) {
-        tray.notification_title = "Virtual HID Broker License";
-        tray.notification_text = "Activate a machine license to use virtual gamepads. Click to manage the license.";
+        tray.notification_title = "Virtual HID Broker 许可证";
+        tray.notification_text = "激活设备许可证以使用虚拟手柄。点击管理许可证。";
         tray.notification_cb = []() {
           launch_ui("/troubleshooting#virtualhid-license");
         };
       } else {
-        tray.notification_title = "Virtual HID Broker Is Unavailable";
-        tray.notification_text = "Install and start Virtual HID Broker to use virtual gamepads. Click to download.";
+        tray.notification_title = "Virtual HID Broker 不可用";
+        tray.notification_text = "安装并启动 Virtual HID Broker 以使用虚拟手柄。点击下载。";
         tray.notification_cb = []() {
           tray_virtualhid_download_cb(nullptr);
         };
@@ -544,14 +544,14 @@ namespace system_tray {
     const std::scoped_lock lock(tray_state_mutex());
     clear_tray_notification();
 
-    const auto displayed_version = version.empty() ? "unknown" : std::format("v{}", version);
+    const auto displayed_version = version.empty() ? "未知" : std::format("v{}", version);
     auto &notification_text = virtualhid_driver_notification_text_storage();
     notification_text = std::format(
-      "Installed Virtual HID Broker {} is not supported by this version of Sunshine. Supported versions: {}. Restart Sunshine after updating. Click for instructions.",
+      "已安装的 Virtual HID Broker {} 不受本版本 CATL投屏 支持。支持的版本：{}。更新后请重启 CATL投屏。点击查看操作说明。",
       displayed_version,
       supported_versions
     );
-    tray.notification_title = "Update Virtual HID Broker";
+    tray.notification_title = "更新 Virtual HID Broker";
     tray.notification_text = notification_text.c_str();
     tray.notification_icon = tray.allIconPaths[4];
     tray.notification_cb = []() {
@@ -765,7 +765,7 @@ namespace system_tray {
 
     tray_set_log_callback(qt_log_to_boost);
 
-    tray_set_app_info(PROJECT_NAME, PROJECT_NAME, PROJECT_FQDN);
+    tray_set_app_info("CATL投屏", "CATL投屏", PROJECT_FQDN);
 
     {
       const std::scoped_lock lock(tray_state_mutex());
@@ -839,9 +839,9 @@ namespace system_tray {
     tray.icon = tray.allIconPaths[2];
     tray_update(&tray);
     tray.icon = tray.allIconPaths[2];
-    tray.notification_title = "Stream Started";
+    tray.notification_title = "串流已开始";
 
-    static std::string msg = std::format("Streaming started for {}", app_name);
+    static std::string msg = std::format("已开始串流 {}", app_name);
     tray.notification_text = msg.c_str();
     tray.tooltip = msg.c_str();
     tray.notification_icon = tray.allIconPaths[2];
@@ -861,9 +861,9 @@ namespace system_tray {
     tray.icon = tray.allIconPaths[3];
     tray_update(&tray);
 
-    static std::string msg = std::format("Streaming paused for {}", app_name);
+    static std::string msg = std::format("串流已暂停 {}", app_name);
     tray.icon = tray.allIconPaths[3];
-    tray.notification_title = "Stream Paused";
+    tray.notification_title = "串流已暂停";
     tray.notification_text = msg.c_str();
     tray.tooltip = msg.c_str();
     tray.notification_icon = tray.allIconPaths[3];
@@ -883,12 +883,12 @@ namespace system_tray {
     tray.icon = tray.allIconPaths[0];
     tray_update(&tray);
 
-    static std::string msg = std::format("Application {} successfully stopped", app_name);
+    static std::string msg = std::format("应用 {} 已成功停止", app_name);
     tray.icon = tray.allIconPaths[0];
     tray.notification_icon = tray.allIconPaths[0];
-    tray.notification_title = "Application Stopped";
+    tray.notification_title = "应用已停止";
     tray.notification_text = msg.c_str();
-    tray.tooltip = PROJECT_NAME;
+    tray.tooltip = "CATL投屏";
     tray_update(&tray);
   }
 
@@ -905,10 +905,10 @@ namespace system_tray {
     tray.icon = tray.allIconPaths[0];
     tray_update(&tray);
     tray.icon = tray.allIconPaths[0];
-    tray.notification_title = "Incoming Pairing Request";
-    tray.notification_text = "Click here to complete the pairing process";
+    tray.notification_title = "收到配对请求";
+    tray.notification_text = "点击此处完成配对";
     tray.notification_icon = tray.allIconPaths[1];
-    tray.tooltip = PROJECT_NAME;
+    tray.tooltip = "CATL投屏";
     tray.notification_cb = []() {
       launch_ui("/pin");
     };

@@ -716,7 +716,7 @@ namespace platf::virtualhid {
 
     const auto &selection = profile_for_metadata(metadata);
     auto profile = selection.profile();
-    profile.name = std::format("Sunshine {}", profile.name);
+    profile.name = std::format("CATL投屏 {}", profile.name);
     apply_target_seat(profile);
     if (config::input.gamepad != "auto"sv) {
       BOOST_LOG(info) << "Gamepad "sv << id.globalIndex << " will be "sv << profile.name << " (manual selection)"sv;

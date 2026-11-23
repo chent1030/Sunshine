@@ -5,9 +5,9 @@
   <key>CFBundleIdentifier</key>
   <string>@PROJECT_FQDN@</string>
   <key>CFBundleName</key>
-  <string>@CMAKE_PROJECT_NAME@</string>
+  <string>CATL投屏</string>
   <key>CFBundleDisplayName</key>
-  <string>@CMAKE_PROJECT_NAME@</string>
+  <string>CATL投屏</string>
   <key>CFBundleExecutable</key>
   <string>@CMAKE_PROJECT_NAME@</string>
   <key>CFBundlePackageType</key>
@@ -23,13 +23,13 @@
   <key>LSUIElement</key>
   <true/>
   <key>NSMicrophoneUsageDescription</key>
-  <string>@CMAKE_PROJECT_NAME@ requires access to your microphone to stream audio.</string>
+  <string>CATL投屏 requires access to your microphone to stream audio.</string>
   <key>NSAudioCaptureUsageDescription</key>
-  <string>@CMAKE_PROJECT_NAME@ requires access to system audio to capture and stream audio output.</string>
+  <string>CATL投屏 requires access to system audio to capture and stream audio output.</string>
   <key>NSScreenCaptureUsageDescription</key>
-  <string>@CMAKE_PROJECT_NAME@ requires access to screen recording to capture and stream your screen content.</string>
+  <string>CATL投屏 requires access to screen recording to capture and stream your screen content.</string>
   <key>NSLocalNetworkUsageDescription</key>
-  <string>@CMAKE_PROJECT_NAME@ advertises itself on your local network via Bonjour so Moonlight clients can discover this host.</string>
+  <string>CATL投屏 advertises itself on your local network via Bonjour so Moonlight clients can discover this host.</string>
   <key>NSBonjourServices</key>
 	<array>
 		<string>_nvstream._tcp</string>

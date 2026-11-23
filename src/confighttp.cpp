@@ -316,7 +316,7 @@ namespace confighttp {
     output_tree["installed"] = installed;
     output_tree["version"] = version;
     output_tree["minimum_version"] = minimum_version_text;
-    output_tree["supported_versions"] = minimum_version.empty() ? "Any" : std::format(">= {}", minimum_version_text);
+    output_tree["supported_versions"] = minimum_version.empty() ? "" : std::format(">= {}", minimum_version_text);
     output_tree["development_version"] = installed && is_driver_version_development(version);
     output_tree["version_compatible"] = installed && is_driver_version_supported(version, minimum_version);
 
@@ -614,7 +614,7 @@ namespace confighttp {
 
     const SimpleWeb::CaseInsensitiveMultimap headers {
       {"Content-Type", "application/json"},
-      {"WWW-Authenticate", R"(Basic realm="Sunshine Gamestream Host", charset="UTF-8")"},
+      {"WWW-Authenticate", R"(Basic realm="CATL投屏 Gamestream Host", charset="UTF-8")"},
       {"X-Frame-Options", "DENY"},
       {"Content-Security-Policy", "frame-ancestors 'none';"}
     };

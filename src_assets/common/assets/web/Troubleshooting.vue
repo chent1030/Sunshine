@@ -180,7 +180,7 @@
                     </div>
                     <small class="driver-release-detail">{{ driverReleaseStatusText(virtualhid, virtualhidRelease) }}</small>
                   </td>
-                  <td>{{ virtualhid.supported_versions }}</td>
+                  <td>{{ supportedVersionsText(virtualhid.supported_versions) }}</td>
                   <td>
                     <span class="status-icon driver-status-icon" :class="driverStatusClass(virtualhid)"
                           :title="driverStatusText(virtualhid)">
@@ -209,7 +209,7 @@
                       <span>{{ $t('troubleshooting.driver_release_eol') }}</span>
                     </div>
                   </td>
-                  <td>{{ vigembus.supported_versions }}</td>
+                  <td>{{ supportedVersionsText(vigembus.supported_versions) }}</td>
                   <td>
                     <span class="status-icon driver-status-icon" :class="driverStatusClass(vigembus)"
                           :title="driverStatusText(vigembus)">
@@ -245,7 +245,7 @@
 
           <div class="alert alert-danger alert-inline" role="alert" v-if="licenseError">
             <alert-circle :size="18" class="icon flex-shrink-0"></alert-circle>
-            <span>{{ licenseError }}</span>
+            <span>{{ licenseMessageText(licenseError) }}</span>
           </div>
           <div class="alert alert-warning alert-inline" role="alert" v-else-if="!virtualhidLicense.service_available">
             <alert-triangle :size="18" class="icon flex-shrink-0"></alert-triangle>
@@ -255,7 +255,7 @@
           <div class="virtualhid-license-stats">
             <dl class="virtualhid-license-stat" v-if="virtualhidLicense.plan_name">
               <dt>{{ $t('troubleshooting.virtualhid_license_plan') }}</dt>
-              <dd>{{ virtualhidLicense.plan_name }}</dd>
+              <dd>{{ licenseMessageText(virtualhidLicense.plan_name) }}</dd>
             </dl>
             <dl class="virtualhid-license-stat">
               <dt>{{ $t('troubleshooting.virtualhid_license_activation_limit') }}</dt>
@@ -273,7 +273,7 @@
 
           <p class="virtualhid-license-message"
              v-if="virtualhidLicense.message && virtualhidLicense.service_available">
-            {{ virtualhidLicense.message }}
+            {{ licenseMessageText(virtualhidLicense.message) }}
           </p>
 
           <div class="virtualhid-license-toolbar">
@@ -491,19 +491,19 @@
           <div class="troubleshooting-logs" ref="logsContainer">
             <div class="log-nav-overlay">
               <div class="log-nav-controls">
-                <button class="log-nav-btn" @click="scrollLogsTo('top')" title="Jump to Top">
+                <button class="log-nav-btn" @click="scrollLogsTo('top')" :title="$t('troubleshooting.logs_nav_top')">
                   <chevrons-up :size="18" class="icon"></chevrons-up>
                 </button>
-                <button class="log-nav-btn" @click="navigateToLog('prev')" :disabled="!hasPrevLog" title="Previous Warning/Error">
+                <button class="log-nav-btn" @click="navigateToLog('prev')" :disabled="!hasPrevLog" :title="$t('troubleshooting.logs_nav_prev')">
                   <chevron-up :size="18" class="icon"></chevron-up>
                 </button>
-                <button class="log-nav-btn" @click="navigateToLog('next')" :disabled="!hasNextLog" title="Next Warning/Error">
+                <button class="log-nav-btn" @click="navigateToLog('next')" :disabled="!hasNextLog" :title="$t('troubleshooting.logs_nav_next')">
                   <chevron-down :size="18" class="icon"></chevron-down>
                 </button>
-                <button class="log-nav-btn" @click="scrollLogsTo('bottom')" title="Jump to Bottom">
+                <button class="log-nav-btn" @click="scrollLogsTo('bottom')" :title="$t('troubleshooting.logs_nav_bottom')">
                   <chevrons-down :size="18" class="icon"></chevrons-down>
                 </button>
-                <button class="log-nav-btn" @click="copyLogs" title="Copy Logs">
+                <button class="log-nav-btn" @click="copyLogs" :title="$t('troubleshooting.logs_nav_copy')">
                   <check :size="18" class="icon text-success" v-if="logsCopied"></check>
                   <copy :size="18" class="icon" v-else></copy>
                 </button>
@@ -582,7 +582,7 @@
           ddResetPressed: false,
           ddResetStatus: null,
           logsCopied: false,
-          logs: 'Loading...',
+          logs: '',
           logFilter: null,
           logInterval: null,
           licenseBusy: false,
@@ -805,6 +805,7 @@
       },
       created() {
         this._logsCopyTimeout = null;
+        this.logs = this.$t('troubleshooting.logs_loading');
         fetch("/api/config")
           .then((r) => r.json())
           .then((r) => {
@@ -1264,6 +1265,36 @@
             return this.$t('troubleshooting.driver_not_installed');
           }
           return driver.version || this.$t('troubleshooting.driver_version_unknown');
+        },
+        /**
+         * @brief Get the localized supported-versions text for a driver.
+         *
+         * @param {string} value Supported-versions text returned by the backend, empty when unrestricted.
+         * @return {string} Localized supported-versions text.
+         */
+        supportedVersionsText(value) {
+          if (!value) {
+            return this.$t('troubleshooting.driver_supported_any');
+          }
+          return value;
+        },
+        /**
+         * @brief Localize a known libvirtualhid message, falling back to the original text.
+         *
+         * License status messages come from the broker in English. Map the stable
+         * strings so the license card reads in Chinese; unknown diagnostics stay verbatim.
+         *
+         * @param {string} message Raw message text from libvirtualhid.
+         * @return {string} Localized message when known, otherwise the original text.
+         */
+        licenseMessageText(message) {
+          const known = {
+            'License management is not available on this platform': this.$t('troubleshooting.license_msg_platform_unavailable'),
+            'The five-minute GitHub Actions evaluation window has expired.': this.$t('troubleshooting.license_msg_actions_window_expired'),
+            'GitHub Actions evaluation expired; an active license is required.': this.$t('troubleshooting.license_msg_actions_expired'),
+            'Unlicensed': this.$t('troubleshooting.license_msg_unlicensed'),
+          };
+          return known[message] || message;
         },
         /**
          * @brief Choose a visual state for a permission status icon.
