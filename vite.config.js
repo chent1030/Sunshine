@@ -36,20 +36,20 @@ else {
 const emitTrayIconsPlugin = {
     name: 'emit-tray-icons',
     buildStart() {
+        const brandIcon = fs.readFileSync(resolve(projectRoot, 'sunshine.svg'));
         this.emitFile({
             type: 'asset',
             fileName: 'images/logo-sunshine.svg',
-            source: fs.readFileSync(resolve(projectRoot, 'sunshine.svg')),
+            source: brandIcon,
         });
 
-        const virtualHidIcon = resolve(projectRoot, 'third-party/libvirtualhid/libvirtualhid.svg');
-        if ((process.platform === 'win32' || process.platform === 'darwin') && fs.existsSync(virtualHidIcon)) {
-            this.emitFile({
-                type: 'asset',
-                fileName: 'images/logo-libvirtualhid.svg',
-                source: fs.readFileSync(virtualHidIcon),
-            });
-        }
+        // The tray slot that previously showed the libvirtualhid brand now carries
+        // the product logo; the vendored lib keeps its own artwork untouched.
+        this.emitFile({
+            type: 'asset',
+            fileName: 'images/logo-libvirtualhid.svg',
+            source: brandIcon,
+        });
     },
 };
 
