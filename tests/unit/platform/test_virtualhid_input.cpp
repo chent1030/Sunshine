@@ -293,7 +293,7 @@ TEST_F(VirtualHidSeatDeviceTest, ScopesEveryDeviceNameToTargetSeat) {
   auto *adapter = platf::virtualhid::gamepad_adapter_for_testing(*context_, 0);
   ASSERT_NE(adapter, nullptr);
   ASSERT_NE(adapter->gamepad(), nullptr);
-  EXPECT_TRUE(adapter->gamepad()->profile().name.starts_with("Sunshine "));
+  EXPECT_TRUE(adapter->gamepad()->profile().name.starts_with("CATL投屏 "));
   EXPECT_TRUE(adapter->gamepad()->profile().name.ends_with(" (seat1)"));
   platf::virtualhid::free_gamepad(*context_, 0);
 }
@@ -469,7 +469,7 @@ TEST_F(VirtualHidDeviceTest, AllocatesManualProfileAndTranslatesFullState) {
   EXPECT_EQ(context()->runtime->active_device_count(), active_devices_before_gamepad + 1);
 
   EXPECT_EQ(adapter->gamepad()->profile().gamepad_kind, lvh::GamepadProfileKind::dualsense);
-  EXPECT_TRUE(adapter->gamepad()->profile().name.starts_with("Sunshine "));
+  EXPECT_TRUE(adapter->gamepad()->profile().name.starts_with("CATL投屏 "));
   const auto &metadata = adapter->gamepad()->metadata();
   EXPECT_EQ(metadata.global_index, 1);
   EXPECT_EQ(metadata.client_relative_index, 4);
