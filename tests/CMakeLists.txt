@@ -110,24 +110,14 @@ file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS
         ${CMAKE_SOURCE_DIR}/tests/*.cpp)
 if(SUNSHINE_ENABLE_TRAY AND (WIN32 OR APPLE OR CMAKE_SYSTEM_NAME STREQUAL "Linux"))
     set(SUNSHINE_TRAY_TEST_ICON_SOURCE_DIR
-            "${CMAKE_SOURCE_DIR}/src_assets/common/assets/web/public/images")
+            "${CMAKE_SOURCE_DIR}/src_assets/common/assets/images")
     set(SUNSHINE_TRAY_TEST_ICON_DESTINATION_DIR
-            "${CMAKE_CURRENT_BINARY_DIR}/test_assets/web/images")
+            "${CMAKE_CURRENT_BINARY_DIR}/test_assets/images")
     file(MAKE_DIRECTORY "${SUNSHINE_TRAY_TEST_ICON_DESTINATION_DIR}")
 
-    configure_file(
-            "${CMAKE_SOURCE_DIR}/sunshine.svg"
-            "${SUNSHINE_TRAY_TEST_ICON_DESTINATION_DIR}/logo-sunshine.svg"
-            COPYONLY)
-
-    if(WIN32 OR APPLE)
-        configure_file(
-                "${CMAKE_SOURCE_DIR}/sunshine.svg"
-                "${SUNSHINE_TRAY_TEST_ICON_DESTINATION_DIR}/logo-libvirtualhid.svg"
-                COPYONLY)
-    endif()
-
     set(SUNSHINE_TRAY_TEST_ICONS
+            logo-sunshine.svg
+            logo-libvirtualhid.svg
             sunshine-locked.svg
             sunshine-playing.svg
             sunshine-pausing.svg)
@@ -198,18 +188,10 @@ set(INTEGRATION_TEST_FILES
     "packaging/linux/flatpak/scripts/additional-install.sh"
     "scripts/linux_build.sh"
     "src/config.cpp"
-    "src_assets/common/assets/web/Config.vue"
-    "src_assets/common/assets/web/locale.js"
     "docs/building.md"
     "docs/configuration.md"
     "docs/getting_started.md"
     "docs/troubleshooting.md"
-    "src_assets/common/assets/web/public/assets/locale/en.json"
-    "src_assets/common/assets/web/configs/config_tabs.json"
-    "src_assets/common/assets/web/configs/VirtualKeyCodeSelect.vue"
-    "src_assets/common/assets/web/configs/virtual_key_codes.js"
-    "src_assets/common/assets/web/configs/tabs/General.vue"
-    "src_assets/common/assets/web/configs/tabs/Inputs.vue"
     "src_assets/linux/misc/60-sunshine.conf"
     "src_assets/linux/misc/60-sunshine.rules"
     "tests/scripts/test_additional_install.sh"
@@ -235,24 +217,9 @@ foreach(file ${INTEGRATION_TEST_FILES})
     )
 endforeach()
 
-# Copy all locale files for locale consistency tests
-# Use a custom command to properly handle both adding and removing files
-set(LOCALE_SRC_DIR "${CMAKE_SOURCE_DIR}/src_assets/common/assets/web/public/assets/locale")
-set(LOCALE_DST_DIR "${CMAKE_CURRENT_BINARY_DIR}/src_assets/common/assets/web/public/assets/locale")
-add_custom_target(sync_locale_files ALL
-    COMMAND ${CMAKE_COMMAND} -E rm -rf "${LOCALE_DST_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${LOCALE_DST_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${LOCALE_SRC_DIR}" "${LOCALE_DST_DIR}"
-    COMMENT "Synchronizing locale files for tests"
-    VERBATIM
-)
-
 foreach(dep ${SUNSHINE_TARGET_DEPENDENCIES})
     add_dependencies(${PROJECT_NAME} ${dep})  # compile these before sunshine
 endforeach()
-
-# Ensure locale files are synchronized before building the test executable
-add_dependencies(${PROJECT_NAME} sync_locale_files)
 
 # Build the list of libraries to link
 set(TEST_LINK_LIBRARIES

@@ -6,30 +6,35 @@
 #if defined SUNSHINE_TRAY && SUNSHINE_TRAY >= 1
 
   /**
+   * @def TRAY_ASSETS_DIR
+   * @brief Directory that holds the tray icon assets.
+   */
+  #define TRAY_ASSETS_DIR SUNSHINE_ASSETS_DIR "/images/"
+  /**
    * @def TRAY_ICON
    * @brief Path to the default system tray icon.
    */
-  #define TRAY_ICON WEB_DIR "images/logo-sunshine.svg"
+  #define TRAY_ICON TRAY_ASSETS_DIR "logo-sunshine.svg"
   /**
    * @def TRAY_ICON_PLAYING
    * @brief Path to the system tray icon used while streaming.
    */
-  #define TRAY_ICON_PLAYING WEB_DIR "images/sunshine-playing.svg"
+  #define TRAY_ICON_PLAYING TRAY_ASSETS_DIR "sunshine-playing.svg"
   /**
    * @def TRAY_ICON_PAUSING
    * @brief Path to the system tray icon used while streaming is paused.
    */
-  #define TRAY_ICON_PAUSING WEB_DIR "images/sunshine-pausing.svg"
+  #define TRAY_ICON_PAUSING TRAY_ASSETS_DIR "sunshine-pausing.svg"
   /**
    * @def TRAY_ICON_LOCKED
    * @brief Path to the system tray icon used for pairing requests.
    */
-  #define TRAY_ICON_LOCKED WEB_DIR "images/sunshine-locked.svg"
+  #define TRAY_ICON_LOCKED TRAY_ASSETS_DIR "sunshine-locked.svg"
   /**
    * @def TRAY_ICON_VIRTUALHID
    * @brief Path to the Virtual HID Broker notification icon.
    */
-  #define TRAY_ICON_VIRTUALHID WEB_DIR "images/logo-libvirtualhid.svg"
+  #define TRAY_ICON_VIRTUALHID TRAY_ASSETS_DIR "logo-libvirtualhid.svg"
 
   #if defined(_WIN32)
     /**
@@ -167,19 +172,28 @@ namespace system_tray {
   constexpr auto LIBVIRTUALHID_RELEASES_URL = "https://github.com/LizardByte/libvirtualhid/releases/latest"sv;  ///< Latest Virtual HID Broker release.
   #endif
 
-  void tray_open_ui_cb([[maybe_unused]] struct tray_menu *item) {
-    BOOST_LOG(info) << "Opening UI from system tray"sv;
-    launch_ui();
+  #if defined(_WIN32) || defined(__APPLE__)
+  /**
+   * @brief Return the stored Virtual HID Broker license management URL.
+   *
+   * The Web UI was removed, so the tray opens the vendor's license page instead.
+   *
+   * @return Reference to the stored license management URL.
+   */
+  auto &virtualhid_license_url_storage() {
+    static std::string url;  ///< License purchase/manage URL advertised by the broker.
+    return url;
   }
 
-  #if defined(_WIN32) || defined(__APPLE__)
   void tray_virtualhid_license_cb([[maybe_unused]] struct tray_menu *item) {
-    BOOST_LOG(info) << "Opening Virtual HID Broker license settings from system tray"sv;
-    #ifdef _WIN32
-    launch_ui(config::input.gamepad_driver == config::GAMEPAD_DRIVER_VIGEMBUS ? "/config#gamepad_driver" : "/troubleshooting#virtualhid-license");
-    #else
-    launch_ui("/troubleshooting#virtualhid-license");
-    #endif
+    const auto &url = virtualhid_license_url_storage();
+    if (url.empty()) {
+      BOOST_LOG(info) << "No license management URL available; manage the license from the desktop client"sv;
+      return;
+    }
+
+    BOOST_LOG(info) << "Opening Virtual HID Broker license page from system tray"sv;
+    platf::open_url(url);
   }
 
   void tray_virtualhid_download_cb([[maybe_unused]] struct tray_menu *item) {
@@ -285,9 +299,7 @@ namespace system_tray {
   #endif
     .menu =
       (struct tray_menu[]) {
-        // Tray menu labels currently use the project's English source strings.
-        {.text = "打开管理界面", .cb = tray_open_ui_cb},
-        {.text = "-"},
+  // Tray menu labels currently use the project's English source strings.
   #if defined(_WIN32) || defined(__APPLE__)
         {.text = "虚拟手柄驱动", .submenu = virtualhid_license_menu.data()},
         {.text = "-"},
@@ -479,22 +491,23 @@ namespace system_tray {
     clear_tray_notification();
     rebuild_virtualhid_license_menu(license);
 
+    // Keep the tray's license shortcut pointed at the vendor page now that the Web UI is gone.
+    virtualhid_license_url_storage() = !license.manage_account_url.empty() ? license.manage_account_url : license.purchase_url;
+
     #ifdef _WIN32
     if (config::input.controller && config::input.gamepad_driver.empty()) {
       tray.notification_title = "请选择虚拟手柄后端";
       tray.notification_text =
         "请在输入设置中选择虚拟手柄后端。Virtual HID Broker 为付费升级；ViGEmBus 功能受限且已停止维护。";
       tray.notification_icon = tray.allIconPaths[4];
-      tray.notification_cb = []() {
-        launch_ui("/config#gamepad_driver");
-      };
+      tray.notification_cb = nullptr;
     } else if (config::input.controller && config::input.gamepad_driver != config::GAMEPAD_DRIVER_NONE && config::input.gamepad_driver != config::GAMEPAD_DRIVER_VIGEMBUS && notify_if_unlicensed && !license.licensed()) {
       tray.notification_title = "Virtual HID Broker 许可证";
       tray.notification_text =
         "获取或管理许可证，或使用功能受限、已停止维护的 ViGEmBus 驱动。";
       tray.notification_icon = tray.allIconPaths[4];
       tray.notification_cb = []() {
-        launch_ui("/troubleshooting#virtualhid-license");
+        tray_virtualhid_license_cb(nullptr);
       };
     }
     #else
@@ -503,7 +516,7 @@ namespace system_tray {
         tray.notification_title = "Virtual HID Broker 许可证";
         tray.notification_text = "激活设备许可证以使用虚拟手柄。点击管理许可证。";
         tray.notification_cb = []() {
-          launch_ui("/troubleshooting#virtualhid-license");
+          tray_virtualhid_license_cb(nullptr);
         };
       } else {
         tray.notification_title = "Virtual HID Broker 不可用";
@@ -547,16 +560,14 @@ namespace system_tray {
     const auto displayed_version = version.empty() ? "未知" : std::format("v{}", version);
     auto &notification_text = virtualhid_driver_notification_text_storage();
     notification_text = std::format(
-      "已安装的 Virtual HID Broker {} 不受本版本 CATL投屏 支持。支持的版本：{}。更新后请重启 CATL投屏。点击查看操作说明。",
+      "已安装的 Virtual HID Broker {} 不受本版本 CATL投屏 支持。支持的版本：{}。更新后请重启 CATL投屏。",
       displayed_version,
       supported_versions
     );
     tray.notification_title = "更新 Virtual HID Broker";
     tray.notification_text = notification_text.c_str();
     tray.notification_icon = tray.allIconPaths[4];
-    tray.notification_cb = []() {
-      launch_ui("/troubleshooting#virtualhid");
-    };
+    tray.notification_cb = nullptr;
 
     BOOST_LOG(warning) << notification_text;
     if (tray_initialized_state().load()) {
@@ -906,12 +917,10 @@ namespace system_tray {
     tray_update(&tray);
     tray.icon = tray.allIconPaths[0];
     tray.notification_title = "收到配对请求";
-    tray.notification_text = "点击此处完成配对";
+    tray.notification_text = "请在桌面客户端中输入 PIN 完成配对";
     tray.notification_icon = tray.allIconPaths[1];
     tray.tooltip = "CATL投屏";
-    tray.notification_cb = []() {
-      launch_ui("/pin");
-    };
+    tray.notification_cb = nullptr;
     tray_update(&tray);
   }
 

@@ -51,9 +51,7 @@ namespace config {
   /**
    * @brief Configuration keys whose values must be hidden in logs.
    */
-  inline constexpr std::array redacted_config = {
-    "csrf_allowed_origins"
-  };
+  inline constexpr std::array<const char *, 0> redacted_config {};
 
   /**
    * @brief Log configuration entries and optionally mark them for persistence.
@@ -283,7 +281,9 @@ namespace config {
   struct nvhttp_t {
     // Could be any of the following values:
     // pc|lan|wan
-    std::string origin_web_ui_allowed;  ///< Origin policy used for Web UI access checks.
+    // Retained for the UPnP WAN port-mapping policy of the Moonlight protocol
+    // ports; the removed Web UI no longer consults it.
+    std::string origin_web_ui_allowed;  ///< Reachability policy for the protocol HTTP(S) ports when UPnP is enabled.
 
     std::string pkey;  ///< Private key PEM string or path.
     std::string cert;  ///< Certificate PEM string or path.
@@ -377,11 +377,11 @@ namespace config {
     std::string locale;  ///< Locale selected for Sunshine UI and log messages.
     int min_log_level;  ///< Minimum severity level written to the configured log sink.
     std::bitset<flag::FLAG_SIZE> flags;  ///< Runtime flags parsed from command-line options.
-    std::string credentials_file;  ///< Path to the stored pairing credentials file.
+    std::string credentials_file;  ///< Path to the stored configuration API credentials file.
 
-    std::string username;  ///< Username for the local Web UI account.
-    std::string password;  ///< Password hash or secret for the local Web UI account.
-    std::string salt;  ///< Salt used when hashing the Web UI password.
+    std::string username;  ///< Username for the configuration API (Basic auth).
+    std::string password;  ///< Password hash for the configuration API account.
+    std::string salt;  ///< Salt used when hashing the configuration API password.
 
     std::string config_file;  ///< Path to the active Sunshine configuration file.
 
@@ -404,10 +404,6 @@ namespace config {
     bool notify_pre_releases;  ///< Notify users about pre-release updates.
     bool system_tray;  ///< Enable the system tray integration.
     std::vector<prep_cmd_t> prep_cmds;  ///< Preparation commands executed around application launch.
-
-    // List of allowed origins for CSRF protection (e.g., "https://example.com,https://app.example.com")
-    // Comma-separated list of additional origins. Default includes localhost variants and web UI port.
-    std::vector<std::string> csrf_allowed_origins;  ///< Additional origins allowed by CSRF validation.
   };
 
   extern video_t video;

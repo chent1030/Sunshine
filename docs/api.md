@@ -1,41 +1,51 @@
 # API
 
-Sunshine has a RESTful API which can be used to interact with the service.
+CATL投屏 exposes a JSON configuration API on the loopback interface only
+(`https://127.0.0.1:47990`). The browser Web UI has been removed; this API is
+meant to be consumed by the native desktop client running on the same machine.
 
-Unless otherwise specified, authentication is required for all API calls. You can authenticate using
-basic authentication with the admin username and password.
+Unless otherwise specified, authentication is required for all API calls. You can
+authenticate using basic authentication with the admin username and password.
+
+## First-Run Credentials
+
+Two equivalent paths create the initial admin credentials:
+
+1. **CLI**: `sunshine <username> <password>` writes the credential file and exits.
+2. **API**: `POST /api/password` is reachable **without** authentication while no
+   credentials exist (the listener only accepts loopback connections). Once
+   credentials exist, the endpoint requires basic authentication like every other
+   route.
+
+```bash
+# First run: set credentials over the loopback API (no auth yet)
+curl -k -X POST https://127.0.0.1:47990/api/password \
+  -H "Content-Type: application/json" \
+  -d '{"newUsername":"admin","newPassword":"secret","confirmNewPassword":"secret"}'
+
+# Every later call authenticates with Basic auth
+curl -k -u admin:secret https://127.0.0.1:47990/api/config
+```
 
 ## CSRF Protection
 
-State-changing API endpoints (POST, DELETE) are protected against Cross-Site Request Forgery (CSRF) attacks.
-
-**For Web Browsers:**
-- Requests from same-origin (configured via `csrf_allowed_origins`) are automatically allowed
-- Cross-origin requests require a CSRF token
+State-changing API endpoints (POST, DELETE) are protected against Cross-Site
+Request Forgery (CSRF) attacks.
 
 **For Non-Browser Applications:**
-- Non-browser clients (e.g. `curl`, scripts, custom apps) are **exempt** from CSRF protection
-- CSRF attacks require a browser to silently attach credentials to a cross-origin request — this threat
-  does not apply to non-browser clients that explicitly provide credentials with every request
-- Requests with no `Origin` or `Referer` header (as is typical for non-browser clients) are automatically
-  allowed without a CSRF token
+- Non-browser clients (e.g. `curl`, scripts, the desktop client) are **exempt**
+  from CSRF protection
+- Requests with no `Origin` or `Referer` header (as is typical for non-browser
+  clients) are automatically allowed without a CSRF token
 
-**Example (browser-equivalent cross-origin request):**
-```bash
-# Get CSRF token
-curl -u user:pass https://localhost:47990/api/csrf-token
+**For Browser Requests:**
+- The Web UI was removed and the `csrf_allowed_origins` allowlist no longer
+  exists. Any request that carries an `Origin` or `Referer` header is treated as
+  browser-initiated and is rejected unless it presents a valid CSRF token. No
+  endpoint issues tokens anymore, so browsers are effectively blocked from
+  driving the API.
 
-# Use token in request
-curl -u user:pass -H "X-CSRF-Token: your_token_here" \
-  -X POST https://localhost:47990/api/restart
-```
-
-@htmlonly
-<script src="api.js"></script>
-@endhtmlonly
-
-## GET /api/csrf-token
-@copydoc confighttp::getCSRFToken()
+## Endpoints
 
 ## GET /api/apps
 @copydoc confighttp::getApps()
@@ -48,9 +58,6 @@ curl -u user:pass -H "X-CSRF-Token: your_token_here" \
 
 ## DELETE /api/apps/{index}
 @copydoc confighttp::deleteApp()
-
-## GET /api/browse
-@copydoc confighttp::browseDirectory()
 
 ## GET /api/clients/list
 @copydoc confighttp::getClients()
@@ -72,12 +79,6 @@ curl -u user:pass -H "X-CSRF-Token: your_token_here" \
 
 ## POST /api/config
 @copydoc confighttp::saveConfig()
-
-## GET /api/covers/{index}
-@copydoc confighttp::getCover()
-
-## POST /api/covers/upload
-@copydoc confighttp::uploadCover()
 
 ## GET /api/logs
 @copydoc confighttp::getLogs()

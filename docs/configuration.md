@@ -39,15 +39,15 @@ supported on the current platform.
 
 ## Permissions on every platform
 
-Open **Troubleshooting > Permissions** in the Web UI to see required and optional access for the current platform.
-The Home page flags verifiable required access that is missing. Sunshine checks for access granted while it is running
+Call `GET /api/permissions` on the loopback configuration API (or check the native desktop client) to see required
+and optional access for the current platform. The client flags verifiable required access that is missing. Sunshine checks for access granted while it is running
 and restarts once after all verifiable required access is available. On Unix, adding a user to a group takes effect only
 after a new login session; Sunshine cannot detect the new group membership in the existing process.
 
 On Linux and FreeBSD, virtual keyboard, mouse, and gamepad input need read and write access to `/dev/uinput` (Linux
-also checks `/dev/input/uinput`). The Web UI shows setup steps if that access is missing. On Windows, Sunshine checks
+also checks `/dev/input/uinput`). `GET /api/permissions` reports that access is missing so the desktop client can show setup steps. On Windows, Sunshine checks
 whether its account can list and create files in the `config` directory beside the executable. Windows provides no
-consent prompt for directory ACLs, so the Web UI shows setup steps for correcting access.
+consent prompt for directory ACLs, so `GET /api/permissions` reports the state so the desktop client can show setup steps.
 
 ## General
 
@@ -331,8 +331,8 @@ consent prompt for directory ACLs, so the Web UI shows setup steps for correctin
     <tr>
         <td>Description</td>
         <td colspan="2">
-            Controls which virtual gamepad backend Sunshine may use on Windows and macOS. On Windows, the Web UI and
-            startup notification request a choice while this option is not set. If Sunshine detects an active Virtual
+            Controls which virtual gamepad backend Sunshine may use on Windows and macOS. On Windows, the startup
+            notification requests a choice while this option is not set. If Sunshine detects an active Virtual
             HID Broker license on Windows, it automatically sets this option to `all` when it is missing.
             @warning{ViGEmBus has limited gamepad features, supports only Xbox 360 and DualShock 4 emulation, and has
             reached end of life. Selecting `vigembus` also suppresses Virtual HID Broker startup notifications.}
@@ -1702,7 +1702,11 @@ consent prompt for directory ACLs, so the Web UI shows setup steps for correctin
     <tr>
         <td>Description</td>
         <td colspan="2">
-            The origin of the remote endpoint address that is not denied for HTTPS Web UI.
+            <b>Removed for this fork's Web UI</b>: the browser Web UI no longer exists, so this option no
+            longer governs any origin check. The value is still parsed because the UPnP module uses it to
+            decide whether the Moonlight protocol HTTP(S) ports (47984/47989) are also mapped to the WAN.
+            <br><br>
+            The configuration API itself always binds 127.0.0.1 only and is unaffected by this option.
         </td>
     </tr>
     <tr>
@@ -1720,44 +1724,15 @@ consent prompt for directory ACLs, so the Web UI shows setup steps for correctin
     <tr>
         <td rowspan="3">Choices</td>
         <td>pc</td>
-        <td>Only localhost may access the web ui</td>
+        <td>UPnP maps the protocol ports to localhost only</td>
     </tr>
     <tr>
         <td>lan</td>
-        <td>Only LAN devices may access the web ui</td>
+        <td>UPnP maps the protocol ports to the LAN</td>
     </tr>
     <tr>
         <td>wan</td>
-        <td>Anyone may access the web ui</td>
-    </tr>
-</table>
-
-### csrf_allowed_origins
-
-<table>
-    <tr>
-        <td>Description</td>
-        <td colspan="2">
-            Comma-separated list of additional allowed origins for CSRF protection. These origins will be
-            appended to the default allowed origins (localhost variants and the configured web UI port).
-            Requests from allowed origins can access state-changing API endpoints without CSRF tokens.
-            <br><br>
-            @attention{Only add origins you trust. Each origin must be a complete URL prefix
-            including protocol and host (e.g., https://example.com). Port numbers are optional.}
-        </td>
-    </tr>
-    <tr>
-        <td>Default</td>
-        <td colspan="2">
-            Empty, uses built-in defaults: https://localhost, https://127.0.0.1, https://[::1],
-            with configured UI port variants
-            </td>
-    </tr>
-    <tr>
-        <td>Example</td>
-        <td colspan="2">@code{}
-            csrf_allowed_origins = https://myapp.local,https://custom.domain.com
-            @endcode</td>
+        <td>UPnP maps the protocol ports to the WAN</td>
     </tr>
 </table>
 

@@ -26,18 +26,6 @@ extern "C" {
 
 using namespace std::literals;
 
-std::string get_launch_ui_url(const std::optional<std::string> &path) {
-  std::string url = std::format("https://{}:{}", net::get_bind_address_url_host(), static_cast<int>(net::map_port(confighttp::PORT_HTTPS)));
-  if (path) {
-    url += *path;
-  }
-  return url;
-}
-
-void launch_ui(const std::optional<std::string> &path) {
-  platf::open_url(get_launch_ui_url(path));
-}
-
 namespace args {
   int creds(const char *name, int argc, char *argv[]) {
     if (argc < 2 || argv[0] == "help"sv || argv[1] == "help"sv) {
@@ -244,7 +232,7 @@ namespace service_ctrl {
   }
 
   bool wait_for_ui_ready() {
-    std::cout << "Waiting for Web UI to be ready...";
+    std::cout << "Waiting for the configuration API to be ready...";
 
     // Wait up to 30 seconds for the web UI to start
     for (int i = 0; i < 30; i++) {

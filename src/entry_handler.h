@@ -6,30 +6,12 @@
 
 // standard includes
 #include <atomic>
-#include <optional>
 #include <string>
 #include <string_view>
 
 // local includes
 #include "thread_pool.h"
 #include "thread_safe.h"
-
-/**
- * @brief Build the URL used to launch the Web UI.
- * @param path Optional path to append to the base URL.
- * @return HTTPS URL using the configured bind address and Web UI port.
- * @examples
- * get_launch_ui_url();
- * get_launch_ui_url("/pin");
- * @examples_end
- */
-std::string get_launch_ui_url(const std::optional<std::string> &path = std::nullopt);
-
-/**
- * @brief Launch the Web UI.
- * @param path Optional path to append to the base URL.
- */
-void launch_ui(const std::optional<std::string> &path = std::nullopt);
 
 /**
  * @brief Functions for handling command line arguments.

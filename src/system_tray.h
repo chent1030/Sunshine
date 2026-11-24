@@ -50,7 +50,7 @@ namespace system_tray {
 
 #if defined(_WIN32) || defined(__APPLE__)
   /**
-   * @brief Callback for opening Virtual HID Broker license settings in the Web UI.
+   * @brief Callback for opening the Virtual HID Broker license management page.
    * @param item The tray menu item.
    */
   void tray_virtualhid_license_cb([[maybe_unused]] struct tray_menu *item);
@@ -127,7 +127,7 @@ namespace system_tray {
   void update_tray_stopped(std::string app_name);
 
   /**
-   * @brief Spawns a notification for PIN Pairing. Clicking it opens the PIN Web UI Page
+   * @brief Spawns a notification for PIN Pairing. The user completes pairing from the desktop client.
    */
   void update_tray_require_pin();
 

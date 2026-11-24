@@ -885,7 +885,6 @@ namespace config {
     false,  // notify_pre_releases
     true,  // system_tray
     {},  // prep commands
-    {},  // csrf_allowed_origins
   };
 
   /**
@@ -1814,31 +1813,6 @@ namespace config {
 
     string_restricted_f(vars, "origin_web_ui_allowed", nvhttp.origin_web_ui_allowed, {"pc"sv, "lan"sv, "wan"sv});
 
-    // Parse CSRF allowed origins - always include defaults, then append user-configured origins
-    std::vector<std::string> user_csrf_origins;
-    string_list_f(vars, "csrf_allowed_origins", user_csrf_origins);
-
-    // Start with default localhost variants
-    sunshine.csrf_allowed_origins = {
-      "https://localhost",
-      "https://127.0.0.1",
-      "https://[::1]"
-    };
-
-    // Validate and append user-configured origins
-    bool csrf_invalid_config = false;
-    for (const auto &origin : user_csrf_origins) {
-      if (origin.size() > 8 && origin.starts_with("https://")) {
-        sunshine.csrf_allowed_origins.push_back(origin);
-      } else {
-        csrf_invalid_config = true;
-        BOOST_LOG(warning) << "Invalid 'csrf_allowed_origins' entry rejected: "sv << origin;
-      }
-    }
-    if (csrf_invalid_config) {
-      BOOST_LOG(warning) << "Please refer to: https://docs.lizardbyte.dev/projects/sunshine/latest/md_docs_2configuration.html#csrf_allowed_origins"sv;
-    }
-
     int to = -1;
     int_between_f(vars, "ping_timeout", to, {-1, std::numeric_limits<int>::max()});
     if (to != -1) {
@@ -1931,12 +1905,6 @@ namespace config {
     sunshine.port = (std::uint16_t) port;
 
     // Now that we have the port, add web UI port-specific origins to CSRF allowed list
-    // Web UI runs on port + 1 (PORT_HTTPS offset is 1 for confighttp)
-    const unsigned short web_ui_port = sunshine.port + 1;
-    sunshine.csrf_allowed_origins.push_back(std::format("https://localhost:{}", web_ui_port));
-    sunshine.csrf_allowed_origins.push_back(std::format("https://127.0.0.1:{}", web_ui_port));
-    sunshine.csrf_allowed_origins.push_back(std::format("https://[::1]:{}", web_ui_port));
-
     string_restricted_f(vars, "address_family", sunshine.address_family, {"ipv4"sv, "both"sv});
     string_f(vars, "bind_address", sunshine.bind_address);
 

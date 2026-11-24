@@ -124,53 +124,48 @@ namespace {
     const auto &tray_data = system_tray::tray_data_for_testing();
     ASSERT_NE(tray_data.menu, nullptr);
 
-    EXPECT_STREQ(tray_data.menu[0].text, "打开管理界面");
-    EXPECT_NE(tray_data.menu[0].cb, nullptr);
-    EXPECT_STREQ(tray_data.menu[1].text, "-");
-    EXPECT_EQ(tray_data.menu[1].cb, nullptr);
-
   #if defined(_WIN32) || defined(__APPLE__)
-    EXPECT_STREQ(tray_data.menu[2].text, "虚拟手柄驱动");
-    ASSERT_NE(tray_data.menu[2].submenu, nullptr);
-    EXPECT_STREQ(tray_data.menu[2].submenu[0].text, "状态：检查中");
-    EXPECT_EQ(tray_data.menu[2].submenu[0].disabled, 1);
-    EXPECT_STREQ(tray_data.menu[2].submenu[1].text, "-");
-    EXPECT_STREQ(tray_data.menu[2].submenu[2].text, "获取/管理许可证");
-    EXPECT_NE(tray_data.menu[2].submenu[2].cb, nullptr);
+    EXPECT_STREQ(tray_data.menu[0].text, "虚拟手柄驱动");
+    ASSERT_NE(tray_data.menu[0].submenu, nullptr);
+    EXPECT_STREQ(tray_data.menu[0].submenu[0].text, "状态：检查中");
+    EXPECT_EQ(tray_data.menu[0].submenu[0].disabled, 1);
+    EXPECT_STREQ(tray_data.menu[0].submenu[1].text, "-");
+    EXPECT_STREQ(tray_data.menu[0].submenu[2].text, "获取/管理许可证");
+    EXPECT_NE(tray_data.menu[0].submenu[2].cb, nullptr);
     #ifdef _WIN32
-    EXPECT_STREQ(tray_data.menu[2].submenu[3].text, "虚拟手柄驱动优势");
-    EXPECT_EQ(tray_data.menu[2].submenu[3].cb, nullptr);
-    verify_virtualhid_benefits_menu(tray_data.menu[2].submenu[3].submenu);
-    EXPECT_STREQ(tray_data.menu[2].submenu[4].text, "下载虚拟手柄驱动");
-    EXPECT_NE(tray_data.menu[2].submenu[4].cb, nullptr);
-    EXPECT_EQ(tray_data.menu[2].submenu[5].text, nullptr);
+    EXPECT_STREQ(tray_data.menu[0].submenu[3].text, "虚拟手柄驱动优势");
+    EXPECT_EQ(tray_data.menu[0].submenu[3].cb, nullptr);
+    verify_virtualhid_benefits_menu(tray_data.menu[0].submenu[3].submenu);
+    EXPECT_STREQ(tray_data.menu[0].submenu[4].text, "下载虚拟手柄驱动");
+    EXPECT_NE(tray_data.menu[0].submenu[4].cb, nullptr);
+    EXPECT_EQ(tray_data.menu[0].submenu[5].text, nullptr);
     #else
-    EXPECT_STREQ(tray_data.menu[2].submenu[3].text, "下载虚拟手柄驱动");
-    EXPECT_NE(tray_data.menu[2].submenu[3].cb, nullptr);
-    EXPECT_EQ(tray_data.menu[2].submenu[4].text, nullptr);
+    EXPECT_STREQ(tray_data.menu[0].submenu[3].text, "下载虚拟手柄驱动");
+    EXPECT_NE(tray_data.menu[0].submenu[3].cb, nullptr);
+    EXPECT_EQ(tray_data.menu[0].submenu[4].text, nullptr);
     #endif
-    EXPECT_STREQ(tray_data.menu[3].text, "-");
+    EXPECT_STREQ(tray_data.menu[1].text, "-");
     #ifdef _WIN32
-    EXPECT_STREQ(tray_data.menu[4].text, "重置显示设备配置");
+    EXPECT_STREQ(tray_data.menu[2].text, "重置显示设备配置");
+    EXPECT_NE(tray_data.menu[2].cb, nullptr);
+    EXPECT_STREQ(tray_data.menu[3].text, "重启服务");
+    EXPECT_NE(tray_data.menu[3].cb, nullptr);
+    EXPECT_STREQ(tray_data.menu[4].text, "退出");
     EXPECT_NE(tray_data.menu[4].cb, nullptr);
-    EXPECT_STREQ(tray_data.menu[5].text, "重启服务");
-    EXPECT_NE(tray_data.menu[5].cb, nullptr);
-    EXPECT_STREQ(tray_data.menu[6].text, "退出");
-    EXPECT_NE(tray_data.menu[6].cb, nullptr);
-    EXPECT_EQ(tray_data.menu[7].text, nullptr);
+    EXPECT_EQ(tray_data.menu[5].text, nullptr);
     #else
-    EXPECT_STREQ(tray_data.menu[4].text, "重启服务");
-    EXPECT_NE(tray_data.menu[4].cb, nullptr);
-    EXPECT_STREQ(tray_data.menu[5].text, "退出");
-    EXPECT_NE(tray_data.menu[5].cb, nullptr);
-    EXPECT_EQ(tray_data.menu[6].text, nullptr);
-    #endif
-  #else
     EXPECT_STREQ(tray_data.menu[2].text, "重启服务");
     EXPECT_NE(tray_data.menu[2].cb, nullptr);
     EXPECT_STREQ(tray_data.menu[3].text, "退出");
     EXPECT_NE(tray_data.menu[3].cb, nullptr);
     EXPECT_EQ(tray_data.menu[4].text, nullptr);
+    #endif
+  #else
+    EXPECT_STREQ(tray_data.menu[0].text, "重启服务");
+    EXPECT_NE(tray_data.menu[0].cb, nullptr);
+    EXPECT_STREQ(tray_data.menu[1].text, "退出");
+    EXPECT_NE(tray_data.menu[1].cb, nullptr);
+    EXPECT_EQ(tray_data.menu[2].text, nullptr);
   #endif
   }
 
@@ -228,7 +223,7 @@ namespace {
     verify_state(0, "CATL投屏", "应用已停止", "应用 Moonlight 已成功停止", 0, false);
 
     system_tray::update_tray_require_pin();
-    verify_state(0, "CATL投屏", "收到配对请求", "点击此处完成配对", 1, true);
+    verify_state(0, "CATL投屏", "收到配对请求", "请在桌面客户端中输入 PIN 完成配对", 1, false);
   }
   #endif
 }  // namespace
@@ -334,7 +329,7 @@ TEST_F(SystemTrayTest, LeftClickUsesNativeMacOSMenu) {
 
   tray_data.cb(nullptr);
 
-  EXPECT_STREQ(tray_data.menu[0].text, "打开管理界面");
+  EXPECT_STREQ(tray_data.menu[0].text, "虚拟手柄驱动");
   EXPECT_FALSE(system_tray::tray_initialized_for_testing());
 }
   #endif
@@ -344,13 +339,13 @@ TEST_F(SystemTrayTest, ResolvesDevelopmentTrayIconsFromExecutableDirectory) {
   EXPECT_EQ(system_tray::resource_path_for_testing(nullptr), nullptr);
   EXPECT_EQ(system_tray::resource_path_for_testing(""), nullptr);
 
-  const auto *sunshine_icon = system_tray::resource_path_for_testing("test_assets/web/images/logo-sunshine.svg");
+  const auto *sunshine_icon = system_tray::resource_path_for_testing("test_assets/images/logo-sunshine.svg");
   ASSERT_NE(sunshine_icon, nullptr);
   EXPECT_TRUE(std::filesystem::path {sunshine_icon}.is_absolute());
   EXPECT_TRUE(std::filesystem::exists(sunshine_icon));
-  EXPECT_EQ(system_tray::resource_path_for_testing("test_assets/web/images/logo-sunshine.svg"), sunshine_icon);
+  EXPECT_EQ(system_tray::resource_path_for_testing("test_assets/images/logo-sunshine.svg"), sunshine_icon);
 
-  const auto *virtualhid_icon = system_tray::resource_path_for_testing("test_assets/web/images/logo-libvirtualhid.svg");
+  const auto *virtualhid_icon = system_tray::resource_path_for_testing("test_assets/images/logo-libvirtualhid.svg");
   ASSERT_NE(virtualhid_icon, nullptr);
   EXPECT_TRUE(std::filesystem::path {virtualhid_icon}.is_absolute());
   EXPECT_TRUE(std::filesystem::exists(virtualhid_icon));
@@ -360,9 +355,9 @@ TEST_F(SystemTrayTest, PreparesVirtualHidMenuFromCurrentLicenseStatus) {
   system_tray::prepare_tray_virtualhid_license();
 
   const auto &tray_data = system_tray::tray_data_for_testing();
-  ASSERT_NE(tray_data.menu[2].submenu, nullptr);
-  ASSERT_NE(tray_data.menu[2].submenu[0].text, nullptr);
-  EXPECT_STRNE(tray_data.menu[2].submenu[0].text, "状态：检查中");
+  ASSERT_NE(tray_data.menu[0].submenu, nullptr);
+  ASSERT_NE(tray_data.menu[0].submenu[0].text, nullptr);
+  EXPECT_STRNE(tray_data.menu[0].submenu[0].text, "状态：检查中");
 }
 
 TEST_F(SystemTrayTest, PreparesLicensedVirtualHidMenuBeforeInitialization) {
@@ -377,7 +372,7 @@ TEST_F(SystemTrayTest, PreparesLicensedVirtualHidMenuBeforeInitialization) {
   system_tray::update_tray_virtualhid_license(license, true);
 
   const auto &tray_data = system_tray::tray_data_for_testing();
-  const auto *license_menu = tray_data.menu[2].submenu;
+  const auto *license_menu = tray_data.menu[0].submenu;
   ASSERT_NE(license_menu, nullptr);
   EXPECT_STREQ(license_menu[0].text, "状态：已授权");
   EXPECT_STREQ(license_menu[1].text, "套餐：Yearly");
@@ -417,7 +412,7 @@ TEST_F(SystemTrayTest, PromptsForUnsetGamepadDriverEvenWhenLicensed) {
     "请在输入设置中选择虚拟手柄后端。Virtual HID Broker 为付费升级；ViGEmBus 功能受限且已停止维护。"
   );
   EXPECT_STREQ(tray_data.notification_icon, tray_data.allIconPaths[4]);
-  EXPECT_NE(tray_data.notification_cb, nullptr);
+  EXPECT_EQ(tray_data.notification_cb, nullptr);
 }
 
 TEST_F(SystemTrayTest, NotifiesWhenVirtualHidDriverIsUnsupported) {
@@ -426,13 +421,13 @@ TEST_F(SystemTrayTest, NotifiesWhenVirtualHidDriverIsUnsupported) {
 
   const auto &tray_data = system_tray::tray_data_for_testing();
   const auto expected_notification = std::format(
-    "已安装的 Virtual HID Broker v2026.829.2338.54 不受本版本 CATL投屏 支持。支持的版本：{}。更新后请重启 CATL投屏。点击查看操作说明。",
+    "已安装的 Virtual HID Broker v2026.829.2338.54 不受本版本 CATL投屏 支持。支持的版本：{}。更新后请重启 CATL投屏。",
     supported_versions
   );
   EXPECT_STREQ(tray_data.notification_title, "更新 Virtual HID Broker");
   EXPECT_STREQ(tray_data.notification_text, expected_notification.c_str());
   EXPECT_STREQ(tray_data.notification_icon, tray_data.allIconPaths[4]);
-  EXPECT_NE(tray_data.notification_cb, nullptr);
+  EXPECT_EQ(tray_data.notification_cb, nullptr);
 
   system_tray::resolve_tray_icon_paths_for_testing();
   EXPECT_STREQ(tray_data.notification_icon, tray_data.allIconPaths[4]);
@@ -493,7 +488,7 @@ TEST_F(SystemTrayTest, NoneSelectionSuppressesWindowsVirtualHidNotifications) {
   EXPECT_EQ(tray_data.notification_title, nullptr);
   EXPECT_EQ(tray_data.notification_text, nullptr);
   EXPECT_EQ(tray_data.notification_cb, nullptr);
-  EXPECT_STREQ(tray_data.menu[2].submenu[0].text, "状态：不可用");
+  EXPECT_STREQ(tray_data.menu[0].submenu[0].text, "状态：不可用");
 
   const auto supported_versions = std::format(">= {}", LIBVIRTUALHID_MINIMUM_VERSION);
   system_tray::update_tray_virtualhid_driver(true, "2026.829.2338.54", false, supported_versions);  // NOSONAR(cpp:S1313): not IP addresses
@@ -516,7 +511,7 @@ TEST_P(UnlicensedVirtualHidTrayTest, PreparesMenuAndStartupNotification) {
   system_tray::update_tray_virtualhid_license(license, true);
 
   const auto &tray_data = system_tray::tray_data_for_testing();
-  const auto *license_menu = tray_data.menu[2].submenu;
+  const auto *license_menu = tray_data.menu[0].submenu;
   ASSERT_NE(license_menu, nullptr);
   EXPECT_STREQ(license_menu[0].text, std::format("状态：{}", state_label).c_str());
   EXPECT_STREQ(license_menu[1].text, state_detail);
@@ -560,13 +555,13 @@ TEST_F(SystemTrayTest, NotifiesWhenMacBrokerVersionIsUnsupported) {
 
   const auto &tray_data = system_tray::tray_data_for_testing();
   const auto expected_notification = std::format(
-    "已安装的 Virtual HID Broker v2026.829.2338 不受本版本 CATL投屏 支持。支持的版本：{}。更新后请重启 CATL投屏。点击查看操作说明。",
+    "已安装的 Virtual HID Broker v2026.829.2338 不受本版本 CATL投屏 支持。支持的版本：{}。更新后请重启 CATL投屏。",
     supported_versions
   );
   EXPECT_STREQ(tray_data.notification_title, "更新 Virtual HID Broker");
   EXPECT_STREQ(tray_data.notification_text, expected_notification.c_str());
   EXPECT_STREQ(tray_data.notification_icon, tray_data.allIconPaths[4]);
-  EXPECT_NE(tray_data.notification_cb, nullptr);
+  EXPECT_EQ(tray_data.notification_cb, nullptr);
 }
 
 TEST_F(SystemTrayTest, MacBrokerVersionNotificationRespectsDisabledGamepads) {
@@ -596,7 +591,7 @@ TEST_F(SystemTrayTest, ShowsLicensedMacBrokerDetailsBeforeInitialization) {
 
   const auto &tray_data = system_tray::tray_data_for_testing();
   ASSERT_EQ(tray_data.iconPathCount, 5);
-  const auto *menu = tray_data.menu[2].submenu;
+  const auto *menu = tray_data.menu[0].submenu;
   ASSERT_NE(menu, nullptr);
   EXPECT_STREQ(menu[0].text, "状态：已授权");
   EXPECT_STREQ(menu[1].text, "套餐：Yearly");
@@ -619,7 +614,7 @@ TEST_F(SystemTrayTest, ShowsMacBrokerLicenseAndAvailabilityWithOptionalStartupNo
   system_tray::update_tray_virtualhid_license(license, true);
 
   const auto &tray_data = system_tray::tray_data_for_testing();
-  const auto *menu = tray_data.menu[2].submenu;
+  const auto *menu = tray_data.menu[0].submenu;
   ASSERT_NE(menu, nullptr);
   EXPECT_STREQ(menu[0].text, "状态：未激活");
   EXPECT_STREQ(menu[1].text, "本机没有启用中的许可证");
@@ -842,7 +837,7 @@ TEST_F(SystemTrayVisualTest, CapturesIconTooltipNotificationsAndMenu) {
   verify_state(0, "CATL投屏", "应用已停止", "应用 Moonlight 已成功停止", 0, false);
   capture_notification("sunshine_tray_stopped");
   system_tray::update_tray_require_pin();
-  verify_state(0, "CATL投屏", "收到配对请求", "点击此处完成配对", 1, true);
+  verify_state(0, "CATL投屏", "收到配对请求", "请在桌面客户端中输入 PIN 完成配对", 1, false);
   capture_notification("sunshine_tray_pairing_request");
 
   int menu_position_result = -1;

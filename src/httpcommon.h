@@ -35,7 +35,7 @@ namespace http {
   );
 
   /**
-   * @brief Reload Web UI user credentials from disk.
+   * @brief Reload configuration API user credentials from disk.
    *
    * @param file Destination path for the downloaded content.
    * @return 0 when credentials reload successfully; nonzero on failure.

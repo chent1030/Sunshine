@@ -39,7 +39,7 @@ namespace http {
 
   int reload_user_creds(const std::string &file);
   /**
-   * @brief Check whether the Web UI credentials file exists and is readable.
+   * @brief Check whether the configuration API credentials file exists and is readable.
    *
    * @param file Path to the credentials file.
    * @return True when the credentials file is present.
@@ -67,7 +67,7 @@ namespace http {
       return -1;
     }
     if (!user_creds_exist(config::sunshine.credentials_file)) {
-      BOOST_LOG(info) << "Open the Web UI to set your new username and password and getting started";
+      BOOST_LOG(info) << "No credentials configured yet: run `sunshine <username> <password>` to set them via CLI, or POST /api/password on the loopback configuration API (no authentication required until they are set)";
     } else if (reload_user_creds(config::sunshine.credentials_file)) {
       return -1;
     }
@@ -111,7 +111,7 @@ namespace http {
   }
 
   /**
-   * @brief Check whether the Web UI credentials file exists and is readable.
+   * @brief Check whether the configuration API credentials file exists and is readable.
    */
   bool user_creds_exist(const std::string &file) {
     if (!fs::exists(file)) {
@@ -132,7 +132,7 @@ namespace http {
   }
 
   /**
-   * @brief Reload the Web UI credentials from disk.
+   * @brief Reload the configuration API credentials from disk.
    */
   int reload_user_creds(const std::string &file) {
     pt::ptree inputTree;
@@ -203,7 +203,7 @@ namespace http {
   }
 
   /**
-   * @brief Send a static file response for a Web UI request.
+   * @brief Download a file over HTTP(S) to the given path.
    */
   bool download_file(const std::string &url, const std::string &file, long ssl_version) {
     CURL *curl = curl_easy_init();
