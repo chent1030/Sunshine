@@ -49,16 +49,13 @@ jobs:
       contents: read
     runs-on: ${{ matrix.os }}
     outputs:
-      notarytool_submission_id_arm64: ${{ steps.notarize_submit.outputs.submission_id_arm64 }}
       notarytool_submission_id_x86_64: ${{ steps.notarize_submit.outputs.submission_id_x86_64 }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: "macos-15"
-            name: "macOS-arm64"
-            arch: "arm64"
-            build_docs: "ON"
+          # arm64 暂时移除：GitHub 托管 arm64 runner 容量受限，连续多轮无法分配机器；
+          # 容量恢复后恢复此条目及下方 notarize_dmg 的对应矩阵项。
           - os: "macos-15-intel"
             name: "macOS-x86_64"
             arch: "x86_64"
@@ -264,9 +261,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "macos-15"
-            name: "macOS-arm64"
-            arch: "arm64"
           - os: "macos-15-intel"
             name: "macOS-x86_64"
             arch: "x86_64"

@@ -99,8 +99,7 @@ jobs:
 
           | 文件 | 适用 |
           | --- | --- |
-          | `Sunshine-macOS-arm64.dmg` | Apple 芯片 Mac（M 系列） |
-          | `Sunshine-macOS-x86_64.dmg` | Intel Mac |
+          | `Sunshine-macOS-x86_64.dmg` | Intel Mac；Apple 芯片可经 Rosetta 转译运行 |
           | `Sunshine-Windows-AMD64-installer.msi` | Windows x64 安装包 |
           | `Sunshine-Windows-AMD64-lite.zip` | Windows x64 免安装版 |
           | `Sunshine-Windows-ARM64-installer.msi` / `-lite.zip` | Windows ARM64 |
@@ -113,6 +112,7 @@ jobs:
 
           ## 说明
 
+          - Apple 芯片原生包（arm64）暂缺：GitHub arm64 构建机容量受限，恢复后将补发。
           - macOS 包未做 Apple 公证，首次打开需右键 →「打开」，或执行 `xattr -cr /Applications/Sunshine.app`。
           - Web 管理界面：`https://localhost:47990`
           EOF
